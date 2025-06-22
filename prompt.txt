@@ -1,0 +1,208 @@
+<task_instructions>
+Quiero que analices noticias de política relacionadas con un candidato presidencial.
+El objetivo es el siguiente: te voy a dar un texto correspondiente a un artículo de
+prensa. Necesito que me identifiques el tono de la noticia con respecto al candidato
+que te especifico en la pregunta para entender el medio cómo lo está posicionando
+frente a la opinión pública y saber si el candidato va bien o mal. Es decir, necesito 
+que me digas si la noticia presenta al candidato en un tono positivo, negativo o 
+neutro. Te en cuenta dos cosas:
+
+1. Es probable que ese artículo hable de varios temas 
+y de varios políticos. Quiero que solamente te enfoques en el candidato que te voy a 
+pasar y me respondas lo que te pido a continuación solamente para ese candidato. 
+Por favor, ignora a los demás candidatos y el tono de la noticia con respecto
+a ellos.
+
+2. Puede que la noticia sea sobre la opinión del candidato sobre algunos temas.
+No necesito el tono del candidato sobre esos temas. Necesito el tono de la noticia 
+sobre el candidato. 
+
+Para cada noticia, necesito que entregues tres cosas:
+
+1. Un razonamiento paso a paso donde expliques cómo llegaste a tu conclusión. 
+Este razonamiento debe estar envuelto en llaves <thinking> y debe considerar 
+el lenguaje, las acciones o propuestas del candidato, la reacción del 
+público o analistas, y el contexto general del texto.
+
+2. El tono de la noticia con respecto al candidato envuelto en llaves <tono>: 
+debe ser uno de los siguientes 
+valores — positivo, neutro o negativo. También incluye una breve justificación 
+(una o dos frases) explicando por qué asignaste ese tono y debe estar envuelto en 
+llaves <reason>. Ten cuidado con lo siguiente: el texto puede hablar de varios
+candidatos a la veces, y el tono puede ser positivo para algunos, negativo para 
+otros y neutro para otros. Necesito que solamente me respondas sobre el candidato
+que te pregunto.
+
+3. Tres palabras clave, separadas por coma y envueltas en llaves <key_words>, 
+que resuman lo más importante que dice la noticia sobre el 
+candidato. Las palabras deben ser significativas, evitar lo genérico, y estar 
+relacionadas con las ideas o propuestas principales que se mencionan sobre el candidato.
+
+Formato de salida:
+<thinking> [explicación del razonamiento paso a paso] </thinking>  
+<tono> [Positivo / Neutro / Negativo] </tono>
+<reason> [explicación breve] </reason>
+<key_words> [palabra1, palabra2, palabra3] </key_words>
+
+</task_instructions>
+
+<example>
+Candidato: Sergio Fajardo
+Noticia: "'SEMANA: Usted ha dicho que Petro siempre mete cañazos. ¿La consulta popular se hará?
+JORGE ROBLEDO: Tengo serias dudas, no tanto porque Petro se corra, como pasó cuando se inventó 
+el cuento de la constituyente, sino porque no han presentado nada al Senado. Pero creo que no 
+tendrá éxito, porque le puede suceder que la plenaria del Senado no le apruebe ese trámite. 
+Además, después viene una cosa muy dura y es que esa consulta tiene que superar un umbral, que 
+es muy alto, son más de 13 millones de votos, y ni Petro ni ningún presidente de Colombia ha 
+sido capaz de hacerlo. Hay una cosa que Petro oculta, porque no es que, si se aprueba la 
+consulta, lo que se apruebe quede automáticamente convertido en ley de la República. Eso tendría 
+que convertirse en proyecto de ley, y ningún congresista está obligado a votar una cosa con 
+la que no esté de acuerdo. Aquí hay mucha más demagogia que otra cosa. Es un tema calculado por 
+Petro para mover sus fuerzas, llenarlos de entusiasmo, rabia y ese tipo de cosas en las que 
+él es experto.SEMANA: Eso es importante. ¿La consulta no es vinculante?J.R.: No. Esas preguntas, 
+si se aprueban, hay que convertirlas en proyecto de ley. Y mi experiencia me dice que no se 
+puede obligar a un congresista a votar una ley con la que no está de acuerdo.SEMANA: ¿Será que el 
+Senado niega la consulta?J.R.: No están obligados a aprobarla. La mayoría del Senado puede votar 
+que sí se haga la consulta, pero también podría votar que no sin problema. Eso pasa en todos los 
+Congresos del mundo.SEMANA: El presidente Petro habla como si el Congreso tuviera la obligación 
+de aprobar todo lo que envía al Legislativo.J.R.: Ese es uno de los mayores desenfoques de Petro. 
+Él sabe que eso no es cierto, pero, como es astuto, pues monta el cuento de que él es el 
+presidente y que los congresistas tienen que votar como a él se le dé la gana. No, en Colombia 
+hay democracia, y las ramas del poder se deben respetar. Petro habla mucha paja, carreta y cuentos. 
+Petro y los petristas tienen que ser serios. Cuando un presidente se impone por la fuerza sobre el 
+Poder Legislativo, lo que empieza a aparecer es una dictadura, no una democracia. Lo demás es 
+charlatanería y amenazas inaceptables que no le podemos aceptar ni a Petro ni a ningún presidente 
+de la república.SEMANA: ¿El presidente Petro es un charlatán?J.R.: Gustavo Petro es bastante 
+charlatán y aprovecho para invitar al petrismo a que escoja algún senador, por ejemplo, y hagamos 
+un debate sobre el Gobierno de Petro; hacemos un balance. Estoy seguro de que pierden el debate. 
+Este es un Gobierno que salió tan malo o peor de lo que yo me imaginé. Si usted mira el número de 
+arrepentidos, todos los días aumenta.SEMANA: ¿La consulta realmente es pensando en los colombianos 
+o con miras a las elecciones de 2026?J.R.: En las elecciones. Petro no es un genio como él cree, 
+es bastante mediocre a mi juicio, pero tampoco es bobo. Es evidente que esta es una astucia de 
+Petro, como otras tantas. Recuerden que duró un año hablando de la constituyente. En este momento 
+quiere mover a la gente, engatusarlos, echarles cuentos de que ahora sí en esa consulta va a poder 
+hacer lo que el Congreso no le permitió. Eso es paja, es solamente una manera de hacer política. 
+Y digamos que se aprueba la consulta; en 2026 ningún congresista votará nada porque ya están de 
+salida. La consulta de Petro es para hacer política.SEMANA: Hablando de 2026, ¿la izquierda queda 
+afectada por el Gobierno Petro?J.R.: En general, cualquier idea de cambio va a quedar mucho más 
+difícil en Colombia después de este mandato. El cuento de que Petro es de izquierda es una discusión 
+que hay que tener, y yo lo dije en el libro que acabo de publicar, en el que el último capítulo se 
+titula con interrogación obligatoria: ‘¿Y Petro sí es de izquierda?’. Me hago esa pregunta, porque 
+en las relaciones militares internacionales está en la misma posición de los Gobiernos anteriores. 
+En los temas centrales de la economía, como la industria, el agro, la producción agropecuaria y el 
+desarrollo científico del país, Petro es calcado de los presidentes anteriores. Petro siempre ha 
+sido neoliberal. Petro se opuso, siendo senador del Polo, a que nos opusiéramos a los tratados de 
+libre comercio. Es que hay unos que lo conocemos muy bien.SEMANA: ¿La reforma a la salud saldrá 
+adelante?J.R.: No estoy al tanto de cómo está el Congreso por dentro, pero es bien probable que 
+no le aprueben esa reforma, entre otras cosas, porque la verdad es que no resuelve los problemas 
+de la salud. Petro y Guillermo Alfonso Jaramillo están tirándoselas de ciegos para no ver que no 
+alcanza la plata de la UPC. Yo he estudiado eso de verdad, sé de qué estoy hablando. Aquí hay un 
+problema que es de fondo y eso explica lo que está pasando actualmente. Mire lo que hicieron con 
+la salud de los educadores; eso es un desastre, y los colombianos están sufriendo por no poder 
+acceder a la salud.SEMANA: ¿Petro les ha cumplido a quienes votaron por él?J.R.: No, yo creo que 
+en general no. La verdad es que es muy poco lo que ha cambiado. En Colombia cambiaron los pasajeros 
+de los carros oficiales, porque ahora la burocracia del Estado está llena de petristas. Inclusive, 
+leí que se sientan en una silla y no trabajan.SEMANA: ¿A Petro le alcanzará para reelegir su 
+proyecto político?J.R.: Lo veo muy difícil porque se ha equivocado demasiado y en este próximo 
+año sí que se va a equivocar. Los errores de Petro va a tocar moverlos en tractomulas porque no 
+van a caber en trenes y eso le va a golpear su candidatura. Y porque tienen otro problema que es 
+muy grave: Gustavo Petro no puede ser candidato. Así que no veo a nadie del petrismo que no sea 
+mediocre.SEMANA: ¿Ni Gustavo Bolívar ni María José Pizarro?J.R.: Mire lo que le pasó a Bolívar en 
+Bogotá, donde quedó de tercero. Él no es un buen candidato.SEMANA: Y el denominado centro, ¿cómo 
+está?J.R.: No me gusta mucho eso de centro, porque no sé qué quiere decir, pero en mi caso estamos 
+con Dignidad y Compromiso junto con Sergio Fajardo. No vamos a respaldar a un candidato petrista, 
+pero tampoco vamos a respaldar a un candidato de los jefes políticos de los Gobiernos anteriores. 
+Con Fajardo queremos ser capaces de crear una coalición que no sea ni petrista ni de los mismos 
+con las mismas.SEMANA: ¿Usted tiene alguna aspiración política?J.R.: Hay gente muy generosa que me 
+dice que repita la candidatura a la presidencia, pero con toda franqueza, y lo digo aquí, no se me 
+pasa por la cabeza ser presidente de la República de Colombia. Me siento muy bien representado 
+por Sergio Fajardo, quien lo está haciendo supremamente bien."
+
+<thinking> A pesar de que la noticia tiene un tono negativo frente al gobierno de Gustavo Petro,
+el entrevistado tiene un tono positivo frente a Sergio Fajardo al decir que se siente muy bien
+representado por él. </thinking>  
+<tono> Positivo  </tono>
+<reason> El entrevistado tiene una imagen positiva de Sergio Fajardo.  </reason> 
+<key_words> representación, respaldo, coalición </key_words> 
+</example>
+
+<example>
+Candidato: Sergio Fajardo
+Noticia: "'Desde que falleció Rodolfo Hernández, el 2 de septiembre de 2024, sus redes sociales 
+no se detuvieron. Su hijo Rodolfo José Hernández, quien más acompañó al ingeniero santandereano 
+en su carrera pública, las dirige a través de una fundación que lleva el nombre del excandidato 
+presidencial.Fue desde esas mismas redes sociales que respondieron, este martes 11 de marzo, al 
+excandidato presidencial Sergio Fajardo, quien le contó al país sobre por qué en 2022 decidió no 
+aliarse con Hernández y, al contrario, votar nuevamente en blanco en la segunda vuelta presidencial. 
+Este hecho, sin duda, puso en ventaja al hoy presidente Gustavo Petro. Fajardo entregó su versión 
+en una entrevista digital que le concedió al congresista del Centro Democrático, Andrés Guerra.
+“Rodolfo Hernández me dijo: ‘Véngase conmigo que usted maneja el país’. Yo le respondí que no, 
+que si él quería que yo manejara el país pues que votara por mí”.Recordó que él convocó a Rodolfo 
+Hernández para que se reuniera con los integrantes de la coalición Centro Esperanza para tomar 
+una decisión. “Ahí está la foto, porque yo no tengo por qué estar escondiéndome ni borrando fotos. 
+Escuchamos, le dijimos que evaluara lo que nosotros pensábamos. Por supuesto que estábamos 
+lejísimos de lo que él pensaba. Y yo les dije: ‘A mí me da muchísima pena, pero yo por este señor 
+no voto. Y voté en blanco”, contó.Ese mensaje de Sergio Fajardo indignó a la familia del ingeniero 
+santandereano y, por eso, desde las redes oficiales, le respondieron.“El tibio de Sergio Fajardo 
+no quiso ayudar en segunda vuelta porque no cedimos en su intención de dejar los consulados y 
+embajadas. Todo para mantener los intereses de su novia, María Ángela Holguín, canciller de los 
+ocho años de Juan Manuel Santos. ¡Hipócrita, acomodado, burócrata!”.Recordemos que esta misma 
+versión la contó a SEMANA Socorro Oliveros, la esposa de Rodolfo Hernández.El 3 de agosto de 
+2024, en diálogo con SEMANA, ella entregó la versión que le había contado su esposo para que 
+dicha alianza no se concretara.“Rodolfo quería acabar con la vagabundería de tantas embajadas 
+y Fajardo no quería cerrar ni una; él es novio o esposo de María Ángela Holguín, la que era 
+ministra de Relaciones Exteriores de Santos. Ellos insistían en seguir con todo ese gasto, y 
+Rodolfo decía que era un gasto innecesario. Fajardo quería seguir con esa burocracia, y esa 
+fue una de las grandes diferencias que tuvieron”, sostuvo.De acuerdo con Oliveros, la petición 
+de Fajardo se la contó el mismo Rodolfo Hernández: “Ellos no entendieron que la forma de avanzar 
+es con el ejemplo, frenando el derroche”.De acuerdo con la esposa del ingeniero, el exgobernador 
+de Antioquia y excandidato presidencial es un “acomodado”.“Como Rodolfo no cedió a lo que él 
+quería, se fue y permitió que ganara Petro. Ahí estamos todos llevando del bulto”, manifestó 
+Oliveros para este medio.'"
+
+<thinking> La noticia se centra en un conflicto entre Sergio Fajardo y la familia de Rodolfo 
+Hernández. Fajardo relata su decisión de no aliarse con Hernández, resaltando una diferencia 
+de perspectiva política. Sin embargo, las respuestas de la familia de Hernández son críticas 
+hacia Fajardo, utilizando términos como "hipócrita", "acomodado" y "burócrata". Este lenguaje 
+indica un tono negativo hacia Fajardo. También se menciona que su decisión impactó en el 
+resultado electoral favorable a Gustavo Petro, lo cual podría ser interpretado como una crítica 
+indirecta a su juicio político. No hay elementos en el texto que presenten a Fajardo de una 
+manera positiva o neutral. </thinking>  
+<tono> Negativo  </tono>
+<reason> La noticia describe a Fajardo de manera desfavorable, destacando críticas de hipocresía 
+y acusaciones de mantener intereses personales que afectaron decisiones políticas. </reason>
+<key_words> críticas, intereses personales, segunda vuelta </key_words>
+</example>
+
+<example>
+Candidato: Sergio Fajardo  
+Noticia: "El director del Departamento de Prosperidad Social, Gustavo Bolívar, renunció 
+oficialmente al gobierno del presidente Gustavo Petro.SEMANA confirmó que el alto funcionario 
+dimitió a su cargo el miércoles 30 de abril en una carta dirigida al jefe de Estado. Le 
+agradeció la oportunidad y le mostró su lealtad una vez más a su proyecto político del Pacto 
+Histórico.Bolívar aún no recibe la notificación sobre si le aceptan o no la renuncia, pero él 
+insiste en que llegó la hora de hacerse a un lado del Gobierno y medirse en 2026.El escritor 
+de telenovelas tiene claro que aspirará a la presidencia en 2026. La decisión la ha venido 
+consultando con su pareja, amigos y conocidos en el petrismo y cree que los últimos resultados 
+en las encuestas lo ubican como la figura de la izquierda con más aceptación para reemplazar 
+a Gustavo Petro después del 7 de agosto de 2026.Bolívar ya tenía la decisión tomada desde hace 
+varias semanas.Sin embargo, la más reciente encuesta de Guarumo con EcoAnalítica, donde lo 
+ubicaron en el primer lugar de aprobación, se convirtió en el empujón para que el escritor 
+de telenovelas diera el salto a la contienda presidencial.La encuesta reveló un empate técnico 
+por el primer lugar entre Gustavo Bolívar (12,6 %), Vicky Dávila (11,6 %) y Sergio Fajardo 
+(11,4 %), dado el margen de error del estudio (2,2 %).La medición fue realizada entre el 21 y 
+26 de abril. "
+
+<thinking> La noticia se centra principalmente en la renuncia de Gustavo Bolívar y su posible 
+candidatura presidencial para el 2026, mencionando que encabeza las encuestas junto a Vicky Dávila 
+y Sergio Fajardo. Sin embargo, la mención de Sergio Fajardo es breve y sólo aparece en el contexto 
+de los resultados de una encuesta en la cual está en un empate técnico con Bolívar y Dávila. 
+No se ofrece información adicional sobre Fajardo, sus propuestas o su imagen, por lo que no se 
+presenta una valoración positiva o negativa sobre él en la noticia. El contexto general no 
+sugiere ni alabanza ni crítica hacia Fajardo, manteniendo un tono neutral. </thinking>  
+
+<tono> Neutro  </tono>
+<reason> La mención de Sergio Fajardo es breve y neutra, limitada únicamente a los resultados 
+de una encuesta sin comentarios adicionales sobre su desempeño o características.  </reason> 
+<key_words> encuesta, empate, candidatura </key_words> 
+</example>
