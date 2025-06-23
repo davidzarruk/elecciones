@@ -4,6 +4,7 @@ from utils import extract_canonical_urls, sanitize_headers, get_data, upload_df_
 import pandas as pd
 import pandas as pd
 from bs4 import BeautifulSoup
+from datetime import datetime
 
 
 def handler(event, context):
@@ -53,13 +54,21 @@ def handler(event, context):
 
         df = pd.concat([df, get_data(soup)])
 
+    
+    # Generate current timestamp
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+    # Define the key with the timestamp
+    key = f"semana-politica/news_data_{timestamp}.csv"
+
     upload_df_to_s3(
         df,
-        bucket_name="zarruk",  # Replace with your bucket name
-        key="semana-politica/news_data.csv",  # Replace with your desired S3 path
+        bucket_name="zarruk",
+        key=key,
         file_format="csv"
     )
-    
+
+
 if __name__ == "__main__":
 
     handler({}, {})

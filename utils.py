@@ -6,18 +6,19 @@ from io import StringIO
 
 def upload_df_to_s3(df, bucket_name, key, file_format='csv'):
     s3 = boto3.client('s3')
-    buffer = StringIO()
+    buffer = BytesIO()
 
     if file_format == 'csv':
-        df.to_csv(buffer, index=False)
+        df.to_csv(buffer, index=False, encoding='utf-8')
         content_type = 'text/csv'
     elif file_format == 'json':
-        df.to_json(buffer, orient='records', lines=True)
+        df.to_json(buffer, orient='records', lines=True, force_ascii=False)
         content_type = 'application/json'
     else:
         raise ValueError("Unsupported file format. Use 'csv' or 'json'.")
 
-    s3.put_object(Bucket=bucket_name, Key=key, Body=buffer.getvalue(), ContentType=content_type)
+    buffer.seek(0)  # Rewind the buffer to the beginning
+    s3.put_object(Bucket=bucket_name, Key=key, Body=buffer, ContentType=content_type)
 
 
 def extract_canonical_urls(data, urls=[]):
