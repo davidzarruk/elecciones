@@ -1,10 +1,9 @@
 import requests
 import json
-from utils import extract_canonical_urls, sanitize_headers, get_data
+from utils import extract_canonical_urls, sanitize_headers, get_data, upload_df_to_s3
 import pandas as pd
 import pandas as pd
 from bs4 import BeautifulSoup
-
 
 
 def handler(event, context):
@@ -54,10 +53,14 @@ def handler(event, context):
 
         df = pd.concat([df, get_data(soup)])
 
-    return df
-
+    upload_df_to_s3(
+        df,
+        bucket_name="zarruk",  # Replace with your bucket name
+        key="semana-politica/news_data.csv",  # Replace with your desired S3 path
+        file_format="csv"
+    )
+    
 if __name__ == "__main__":
 
-    response = handler({}, {})
+    handler({}, {})
 
-    print(response)

@@ -1,5 +1,23 @@
 import pandas as pd
 import json
+import boto3
+from io import StringIO
+
+
+def upload_df_to_s3(df, bucket_name, key, file_format='csv'):
+    s3 = boto3.client('s3')
+    buffer = StringIO()
+
+    if file_format == 'csv':
+        df.to_csv(buffer, index=False)
+        content_type = 'text/csv'
+    elif file_format == 'json':
+        df.to_json(buffer, orient='records', lines=True)
+        content_type = 'application/json'
+    else:
+        raise ValueError("Unsupported file format. Use 'csv' or 'json'.")
+
+    s3.put_object(Bucket=bucket_name, Key=key, Body=buffer.getvalue(), ContentType=content_type)
 
 
 def extract_canonical_urls(data, urls=[]):
