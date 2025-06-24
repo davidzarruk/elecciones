@@ -2,6 +2,54 @@ import pandas as pd
 import json
 import boto3
 from io import BytesIO
+import re
+from openai import OpenAI
+import os
+
+
+client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+
+def answer_question(question, prompt_data, tokens=1000):
+    modelId = "gpt-4o"
+
+    input = {
+        "modelId": modelId,
+        "contentType": "application/json",
+        "accept": "*/*"
+    }
+    
+    completion = client.chat.completions.create(
+        model=input['modelId'],
+        messages=[
+            {
+                "role": "user",
+                "content": prompt_data + " " + question
+            }
+        ]
+    )
+
+    response_body = completion.choices[0].message.content
+
+    return response_body
+
+
+def get_sentiment(candidato, text, prompt):
+    question = f"""
+    Candidato: {candidato}
+    Noticia: {text}
+    """
+    
+    text = answer_question(question, prompt)
+    
+    data = {
+        "thinking": re.search(r"<thinking>(.*?)</thinking>", text, re.DOTALL).group(1).strip(),
+        "tono": re.search(r"<tono>(.*?)</tono>", text).group(1).strip(),
+        "reason": re.search(r"<reason>(.*?)</reason>", text).group(1).strip(),
+        "key_words": re.search(r"<key_words>(.*?)</key_words>", text).group(1).strip()
+    }
+    
+    # Convertir a DataFrame
+    return data["thinking"], data["tono"], data["reason"], data["key_words"]
 
 
 def upload_df_to_s3(df, bucket_name, key, file_format='csv'):
