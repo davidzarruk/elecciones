@@ -1,7 +1,7 @@
 import pandas as pd
 import json
 import boto3
-from io import StringIO
+from io import BytesIO
 
 
 def upload_df_to_s3(df, bucket_name, key, file_format='csv'):

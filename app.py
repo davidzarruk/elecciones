@@ -2,7 +2,6 @@ import requests
 import json
 from utils import extract_canonical_urls, sanitize_headers, get_data, upload_df_to_s3
 import pandas as pd
-import pandas as pd
 from bs4 import BeautifulSoup
 from datetime import datetime
 
