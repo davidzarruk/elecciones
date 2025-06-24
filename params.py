@@ -3,7 +3,7 @@ SEMANA_NUM_NEWS = 10
 SEMANA_URL = "https://www.semana.com/pf/api/v3/content/fetch/content-apir"
 
 SEMANA_PARAMS = {
-    "query": '{"feedOffset":9,"feedSize":'+SEMANA_NUM_NEWS+',"includeSections":"politica","sourceInclude":"canonical_url,_id,promo_items,headlines.basic,subheadlines.basic,description.basic,subtype,publish_date,taxonomy,copyright"}',
+    "query": '{"feedOffset":9,"feedSize":'+str(SEMANA_NUM_NEWS)+',"includeSections":"politica","sourceInclude":"canonical_url,_id,promo_items,headlines.basic,subheadlines.basic,description.basic,subtype,publish_date,taxonomy,copyright"}',
     "d": "7730",
     "mxId": "00000000",
     "_website": "semana"

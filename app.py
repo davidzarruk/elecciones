@@ -47,5 +47,5 @@ def scrape_semana_news(event, context):
 
 if __name__ == "__main__":
 
-    handler({}, {})
+    scrape_semana_news({}, {})
 
