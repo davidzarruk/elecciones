@@ -52,21 +52,25 @@ def get_sentiment(candidato, text, prompt):
     return data["thinking"], data["tono"], data["reason"], data["key_words"]
 
 
-def upload_df_to_s3(df, bucket_name, key, file_format='csv'):
+def upload_df_to_s3(df, bucket_name, key):
     s3 = boto3.client('s3')
     buffer = BytesIO()
 
-    if file_format == 'csv':
-        df.to_csv(buffer, index=False, encoding='utf-8')
-        content_type = 'text/csv'
-    elif file_format == 'json':
-        df.to_json(buffer, orient='records', lines=True, force_ascii=False)
-        content_type = 'application/json'
-    else:
-        raise ValueError("Unsupported file format. Use 'csv' or 'json'.")
+    df.to_csv(buffer, index=False, encoding='utf-8')
+    content_type = 'text/csv'
 
     buffer.seek(0)  # Rewind the buffer to the beginning
     s3.put_object(Bucket=bucket_name, Key=key, Body=buffer, ContentType=content_type)
+
+
+def read_df_from_s3(bucket_name, key):
+    s3 = boto3.client('s3')
+    response = s3.get_object(Bucket=bucket_name, Key=key)
+    body = response['Body'].read()
+
+    df = pd.read_csv(BytesIO(body), encoding='utf-8')
+
+    return df
 
 
 def extract_canonical_urls(data, urls=[]):

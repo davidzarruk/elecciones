@@ -1,6 +1,7 @@
 import requests
 import json
-from utils import extract_canonical_urls, sanitize_headers, get_data, upload_df_to_s3
+from utils import extract_canonical_urls, sanitize_headers, get_data, upload_df_to_s3, \
+    read_df_from_s3
 from params import SEMANA_PARAMS, SEMANA_HEADERS, SEMANA_URL, SEMANA_NUM_NEWS
 import pandas as pd
 from bs4 import BeautifulSoup
@@ -40,9 +41,25 @@ def scrape_semana_news(event, context):
     upload_df_to_s3(
         df,
         bucket_name="zarruk",
-        key=key,
-        file_format="csv"
+        key=key
     )
+
+def get_candidate_sentiment():
+    prompt = open('prompt.txt', 'r').read()
+
+    df = read_df_from_s3(
+        bucket_name='zarruk',
+        key='semana-politica/news_data_20250624_110948.csv'
+    )
+
+    df = df.drop_duplicates()
+    df = df[~df['articleBody'].isna()]
+
+    candidato = "Sergio Fajardo"
+    df_fajardo = df[(df['articleBody'].str.lower().str.contains('fajardo')) & \
+                    (df['articleBody'].str.lower().str.contains('sergio'))].reset_index(drop=True)
+
+    df_fajardo[['thinking', 'tono', 'reason', 'keywords_llm']] = ['', '', '', '']
 
 
 if __name__ == "__main__":
