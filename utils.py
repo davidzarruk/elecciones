@@ -41,12 +41,11 @@ def get_sentiment(candidatos, text, prompt):
     
     text = answer_question(question, prompt)
     
+    print(text)
     data_json = json.loads(text)
 
     # Access elements like this:
     print(data_json["María José Pizarro"]["thinking"]) 
-
-    print(text)
 
     data = {
         "thinking": re.search(r"<thinking>(.*?)</thinking>", text, re.DOTALL).group(1).strip(),
