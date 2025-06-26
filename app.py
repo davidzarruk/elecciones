@@ -1,7 +1,7 @@
 import requests
 import json
 from utils import extract_canonical_urls, sanitize_headers, get_data, upload_df_to_s3, \
-    read_df_from_s3, read_all_csvs_from_s3_folder
+    read_all_csvs_from_s3_folder, get_sentiment
 from params import SEMANA_PARAMS, SEMANA_HEADERS, SEMANA_URL, SEMANA_NUM_NEWS
 import pandas as pd
 from bs4 import BeautifulSoup
@@ -62,7 +62,7 @@ def get_candidate_sentiment(event, context):
     pattern = '|'.join([re.escape(name) for name in names])
     df = df[df['articleBody'].str.contains(pattern, case=False, na=False)]
 
-    print(df)
+    get_sentiment(candidates, df['articleBody'].iloc[0], prompt)
 
 if __name__ == "__main__":
 
