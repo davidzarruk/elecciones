@@ -45,7 +45,7 @@ def scrape_semana_news(event, context):
         key=key
     )
 
-def get_candidate_sentiment():
+def get_candidate_sentiment(event, context):
     prompt = open('prompt.txt', 'r').read()
     candidates = open('lista_candidatos.txt', 'r').read()
 
