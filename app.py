@@ -64,6 +64,12 @@ def get_candidate_sentiment(event, context):
     df = df[df['articleBody'].str.contains(pattern, case=False, na=False)]
 
     print(df)
+
+    print("Noticia 1")
+    print(df['articleBody'].iloc[0])
+
+    print("Noticia 2")
+    print(df['articleBody'].iloc[1])
     get_sentiment(candidates, df['articleBody'].iloc[0], prompt)
 
 if __name__ == "__main__":
