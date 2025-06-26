@@ -1,11 +1,12 @@
 import requests
 import json
 from utils import extract_canonical_urls, sanitize_headers, get_data, upload_df_to_s3, \
-    read_df_from_s3
+    read_df_from_s3, read_all_csvs_from_s3_folder
 from params import SEMANA_PARAMS, SEMANA_HEADERS, SEMANA_URL, SEMANA_NUM_NEWS
 import pandas as pd
 from bs4 import BeautifulSoup
 from datetime import datetime
+import re
 
 
 def scrape_semana_news(event, context):
@@ -46,21 +47,22 @@ def scrape_semana_news(event, context):
 
 def get_candidate_sentiment():
     prompt = open('prompt.txt', 'r').read()
+    candidates = open('lista_candidatos.txt', 'r').read()
 
-    df = read_df_from_s3(
+    names = [line.strip() for line in candidates if line.strip() and not line.lower().startswith("lista")]
+
+    df = read_all_csvs_from_s3_folder(
         bucket_name='zarruk',
-        key='semana-politica/news_data_20250624_110948.csv'
+        folder_prefix='semana-politica'
     )
 
     df = df.drop_duplicates()
     df = df[~df['articleBody'].isna()]
 
-    candidato = "Sergio Fajardo"
-    df_fajardo = df[(df['articleBody'].str.lower().str.contains('fajardo')) & \
-                    (df['articleBody'].str.lower().str.contains('sergio'))].reset_index(drop=True)
+    pattern = '|'.join([re.escape(name) for name in names])
+    df = df[df['articleBody'].str.contains(pattern, case=False, na=False)]
 
-    df_fajardo[['thinking', 'tono', 'reason', 'keywords_llm']] = ['', '', '', '']
-
+    print(df)
 
 if __name__ == "__main__":
 

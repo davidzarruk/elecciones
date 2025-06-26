@@ -1,53 +1,66 @@
 <task_instructions>
-Quiero que analices noticias de política relacionadas con un candidato presidencial.
-El objetivo es el siguiente: te voy a dar un texto correspondiente a un artículo de
-prensa. Necesito que me identifiques el tono de la noticia con respecto al candidato
-que te especifico en la pregunta para entender el medio cómo lo está posicionando
-frente a la opinión pública y saber si el candidato va bien o mal. Es decir, necesito 
-que me digas si la noticia presenta al candidato en un tono positivo, negativo o 
-neutro. Te en cuenta dos cosas:
+Quiero que analices noticias de política relacionadas con una lista de candidatos presidenciales.
 
-1. Es probable que ese artículo hable de varios temas 
-y de varios políticos. Quiero que solamente te enfoques en el candidato que te voy a 
-pasar y me respondas lo que te pido a continuación solamente para ese candidato. 
-Por favor, ignora a los demás candidatos y el tono de la noticia con respecto
-a ellos.
+Te daré un artículo de prensa y una lista de candidatos. 
+Quiero que identifiques el tono que la noticia transmite sobre cada candidato, uno por uno. 
+Tu análisis me ayudará a entender cómo los medios están posicionando a los candidatos ante la opinión pública, 
+y si están siendo presentados de manera favorable o desfavorable.
 
-2. Puede que la noticia sea sobre la opinión del candidato sobre algunos temas.
-No necesito el tono del candidato sobre esos temas. Necesito el tono de la noticia 
-sobre el candidato. 
+Ten en cuenta lo siguiente:
 
-Para cada noticia, necesito que entregues tres cosas:
+1. Puede que el artículo hable de varios temas o políticos. 
+   Solo enfócate en los candidatos de la lista que te proporciono. 
 
-1. Un razonamiento paso a paso donde expliques cómo llegaste a tu conclusión. 
-Este razonamiento debe estar envuelto en llaves <thinking> y debe considerar 
-el lenguaje, las acciones o propuestas del candidato, la reacción del 
-público o analistas, y el contexto general del texto.
+2. Puede que la noticia incluya opiniones del propio candidato. 
+   No quiero saber el tono del candidato sobre los temas, sino el tono de la noticia sobre el candidato. 
 
-2. El tono de la noticia con respecto al candidato envuelto en llaves <tono>: 
-debe ser uno de los siguientes 
-valores — positivo, neutro o negativo. También incluye una breve justificación 
-(una o dos frases) explicando por qué asignaste ese tono y debe estar envuelto en 
-llaves <reason>. Ten cuidado con lo siguiente: el texto puede hablar de varios
-candidatos a la veces, y el tono puede ser positivo para algunos, negativo para 
-otros y neutro para otros. Necesito que solamente me respondas sobre el candidato
-que te pregunto.
+3. Puede que la noticia no mencione a todos los candidatos de la lista. 
+   Si un candidato no es mencionado, omítelo completamente del JSON de respuesta. 
+   No incluyas razonamiento ni clasificación para candidatos que no aparecen en la noticia.
 
-3. Tres palabras clave, separadas por coma y envueltas en llaves <key_words>, 
-que resuman lo más importante que dice la noticia sobre el 
-candidato. Las palabras deben ser significativas, evitar lo genérico, y estar 
-relacionadas con las ideas o propuestas principales que se mencionan sobre el candidato.
+Para cada candidato que sí esté mencionado en la noticia, quiero que me entregues:
 
-Formato de salida:
-<thinking> [explicación del razonamiento paso a paso] </thinking>  
-<tono> [Positivo / Neutro / Negativo] </tono>
-<reason> [explicación breve] </reason>
-<key_words> [palabra1, palabra2, palabra3] </key_words>
+1. Un razonamiento paso a paso (clave `thinking`), 
+   donde expliques cómo llegaste a tu conclusión, 
+   considerando el lenguaje del artículo, 
+   las acciones o propuestas mencionadas, 
+   reacciones del público o analistas, 
+   y el contexto general.
 
+2. El tono del artículo sobre el candidato (clave `tono`), 
+   como uno de estos tres valores: `positivo`, `neutro`, `negativo`.
+
+3. Una justificación breve de ese tono (clave `reason`).
+
+4. Tres palabras clave (clave `key_words`), separadas por comas, 
+   que resuman lo más importante que dice la noticia sobre ese candidato.
+
+Entrega la respuesta en formato JSON, así:
+
+{
+  "Nombre del candidato": {
+    "thinking": "explicación paso a paso...",
+    "tono": "positivo | neutro | negativo",
+    "reason": "justificación breve",
+    "key_words": "tres,palabras,clave"
+  },
+  ...
+}
 </task_instructions>
 
+
 <example>
-Candidato: Sergio Fajardo
+Lista de candidatos:
+
+Sergio Fajardo
+María José Pizarro
+Gustavo Bolívar 
+Roy Barreras
+David Luna 
+Vicky Dávila 
+María Fernanda Cabal 
+Paloma Valencia
+
 Noticia: "'SEMANA: Usted ha dicho que Petro siempre mete cañazos. ¿La consulta popular se hará?
 JORGE ROBLEDO: Tengo serias dudas, no tanto porque Petro se corra, como pasó cuando se inventó 
 el cuento de la constituyente, sino porque no han presentado nada al Senado. Pero creo que no 
@@ -118,16 +131,48 @@ dice que repita la candidatura a la presidencia, pero con toda franqueza, y lo d
 pasa por la cabeza ser presidente de la República de Colombia. Me siento muy bien representado 
 por Sergio Fajardo, quien lo está haciendo supremamente bien."
 
-<thinking> A pesar de que la noticia tiene un tono negativo frente al gobierno de Gustavo Petro,
-el entrevistado tiene un tono positivo frente a Sergio Fajardo al decir que se siente muy bien
-representado por él. </thinking>  
-<tono> Positivo  </tono>
-<reason> El entrevistado tiene una imagen positiva de Sergio Fajardo.  </reason> 
-<key_words> representación, respaldo, coalición </key_words> 
-</example>
+{
+  "Sergio Fajardo": {
+    "thinking": "A pesar de que la noticia tiene un tono crítico hacia el gobierno de Petro, 
+    el entrevistado (Jorge Robledo) expresa claramente su respaldo a Sergio Fajardo. Dice sentirse 
+    representado por él y lo muestra como una figura seria y con la que construyen una coalición 
+    alternativa al petrismo y al uribismo.",
+    "tono": "positivo",
+    "reason": "El entrevistado expresa explícitamente que se siente representado por Fajardo y lo 
+    respalda políticamente.",
+    "key_words": "coalición,representación,respaldo"
+  },
+  "Gustavo Bolívar": {
+    "thinking": "El entrevistado menciona a Gustavo Bolívar al ser preguntado por posibles 
+    sucesores del proyecto político de Petro. Robledo dice que Bolívar quedó de tercero en Bogotá 
+    y que no es un buen candidato, lo cual indica un tono negativo.",
+    "tono": "negativo",
+    "reason": "Se le describe como un mal candidato con bajo desempeño electoral.",
+    "key_words": "Bogotá,derrota,candidato"
+  },
+  "María José Pizarro": {
+    "thinking": "La noticia incluye brevemente a María José Pizarro en la misma pregunta en la 
+    que se menciona a Bolívar. Sin embargo, el entrevistado no hace un comentario directo sobre 
+    ella ni la valora explícitamente.",
+    "tono": "neutro",
+    "reason": "Es mencionada, pero no se emite ninguna opinión o juicio sobre ella.",
+    "key_words": "mención,presidenciables,indirecta"
+  }
+}
+
 
 <example>
-Candidato: Sergio Fajardo
+Lista de candidatos:
+
+Sergio Fajardo
+María José Pizarro
+Gustavo Bolívar 
+Roy Barreras
+David Luna 
+Vicky Dávila 
+María Fernanda Cabal 
+Paloma Valencia
+
 Noticia: "'Desde que falleció Rodolfo Hernández, el 2 de septiembre de 2024, sus redes sociales 
 no se detuvieron. Su hijo Rodolfo José Hernández, quien más acompañó al ingeniero santandereano 
 en su carrera pública, las dirige a través de una fundación que lleva el nombre del excandidato 
@@ -160,22 +205,32 @@ de Antioquia y excandidato presidencial es un “acomodado”.“Como Rodolfo no
 quería, se fue y permitió que ganara Petro. Ahí estamos todos llevando del bulto”, manifestó 
 Oliveros para este medio.'"
 
-<thinking> La noticia se centra en un conflicto entre Sergio Fajardo y la familia de Rodolfo 
-Hernández. Fajardo relata su decisión de no aliarse con Hernández, resaltando una diferencia 
-de perspectiva política. Sin embargo, las respuestas de la familia de Hernández son críticas 
-hacia Fajardo, utilizando términos como "hipócrita", "acomodado" y "burócrata". Este lenguaje 
-indica un tono negativo hacia Fajardo. También se menciona que su decisión impactó en el 
-resultado electoral favorable a Gustavo Petro, lo cual podría ser interpretado como una crítica 
-indirecta a su juicio político. No hay elementos en el texto que presenten a Fajardo de una 
-manera positiva o neutral. </thinking>  
-<tono> Negativo  </tono>
-<reason> La noticia describe a Fajardo de manera desfavorable, destacando críticas de hipocresía 
-y acusaciones de mantener intereses personales que afectaron decisiones políticas. </reason>
-<key_words> críticas, intereses personales, segunda vuelta </key_words>
+{
+  "Sergio Fajardo": {
+    "thinking": "La noticia está centrada en las críticas que la familia de Rodolfo Hernández 
+    hace a Fajardo por no apoyarlo en segunda vuelta. Se utilizan calificativos como 'hipócrita', 
+    'acomodado' y 'burócrata'. También se le responsabiliza indirectamente de haber facilitado la 
+    victoria de Petro. No hay ningún comentario favorable hacia Fajardo.",
+    "tono": "negativo",
+    "reason": "El artículo recoge fuertes críticas personales y políticas hacia Fajardo.",
+    "key_words": "críticas,burocracia,segunda vuelta"
+  }
+}
+
 </example>
 
 <example>
-Candidato: Sergio Fajardo  
+Lista de candidatos:
+
+Sergio Fajardo
+María José Pizarro
+Gustavo Bolívar 
+Roy Barreras
+David Luna 
+Vicky Dávila 
+María Fernanda Cabal 
+Paloma Valencia
+
 Noticia: "El director del Departamento de Prosperidad Social, Gustavo Bolívar, renunció 
 oficialmente al gobierno del presidente Gustavo Petro.SEMANA confirmó que el alto funcionario 
 dimitió a su cargo el miércoles 30 de abril en una carta dirigida al jefe de Estado. Le 
@@ -193,16 +248,30 @@ por el primer lugar entre Gustavo Bolívar (12,6 %), Vicky Dávila (11,6 %) y Se
 (11,4 %), dado el margen de error del estudio (2,2 %).La medición fue realizada entre el 21 y 
 26 de abril. "
 
-<thinking> La noticia se centra principalmente en la renuncia de Gustavo Bolívar y su posible 
-candidatura presidencial para el 2026, mencionando que encabeza las encuestas junto a Vicky Dávila 
-y Sergio Fajardo. Sin embargo, la mención de Sergio Fajardo es breve y sólo aparece en el contexto 
-de los resultados de una encuesta en la cual está en un empate técnico con Bolívar y Dávila. 
-No se ofrece información adicional sobre Fajardo, sus propuestas o su imagen, por lo que no se 
-presenta una valoración positiva o negativa sobre él en la noticia. El contexto general no 
-sugiere ni alabanza ni crítica hacia Fajardo, manteniendo un tono neutral. </thinking>  
+{
+  "Gustavo Bolívar": {
+    "thinking": "La noticia presenta a Bolívar como un posible candidato presidencial, destacando 
+    su renuncia al gobierno y su liderazgo en encuestas recientes. Se menciona que cuenta con apoyo 
+    en el petrismo y que lidera junto a Dávila y Fajardo en intención de voto. El lenguaje general 
+    es positivo, resaltando su preparación y popularidad.",
+    "tono": "positivo",
+    "reason": "Se enfatiza su liderazgo en encuestas y su proyección presidencial.",
+    "key_words": "renuncia,candidatura,encuesta"
+  },
+  "Sergio Fajardo": {
+    "thinking": "Fajardo es mencionado solo como parte de un empate técnico en una encuesta. No 
+    se hace ningún comentario adicional sobre su desempeño, propuestas o imagen.",
+    "tono": "neutro",
+    "reason": "La mención es breve y limitada a los resultados de una encuesta.",
+    "key_words": "encuesta,empate,candidatura"
+  },
+  "Vicky Dávila": {
+    "thinking": "Al igual que Fajardo, es mencionada en el contexto de una encuesta en la que 
+    empata con Bolívar y Fajardo. No hay comentarios adicionales sobre su figura o campaña.",
+    "tono": "neutro",
+    "reason": "Solo se menciona en el contexto de una medición de intención de voto.",
+    "key_words": "encuesta,empate,intención"
+  }
+}
 
-<tono> Neutro  </tono>
-<reason> La mención de Sergio Fajardo es breve y neutra, limitada únicamente a los resultados 
-de una encuesta sin comentarios adicionales sobre su desempeño o características.  </reason> 
-<key_words> encuesta, empate, candidatura </key_words> 
 </example>

@@ -73,6 +73,30 @@ def read_df_from_s3(bucket_name, key):
     return df
 
 
+def read_all_csvs_from_s3_folder(bucket_name, folder_prefix):
+    s3 = boto3.client('s3')
+    
+    # Step 1: List all CSV objects in the folder
+    response = s3.list_objects_v2(Bucket=bucket_name, Prefix=folder_prefix)
+    csv_keys = [
+        obj['Key'] for obj in response.get('Contents', [])
+        if obj['Key'].endswith('.csv')
+    ]
+
+    all_dfs = []
+
+    # Step 2: Loop through and read each CSV
+    for key in csv_keys:
+        obj = s3.get_object(Bucket=bucket_name, Key=key)
+        df = pd.read_csv(obj['Body'], encoding='utf-8')
+        df['source_file'] = key  # Optional: track where each row came from
+        all_dfs.append(df)
+
+    # Step 3: Concatenate all into a single DataFrame
+    combined_df = pd.concat(all_dfs, ignore_index=True)
+    return combined_df
+
+
 def extract_canonical_urls(data, urls=[]):
     if isinstance(data, dict):
         for key, value in data.items():
