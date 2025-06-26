@@ -33,14 +33,16 @@ def answer_question(question, prompt_data, tokens=1000):
     return response_body
 
 
-def get_sentiment(candidato, text, prompt):
+def get_sentiment(candidatos, text, prompt):
     question = f"""
-    Candidato: {candidato}
+    {candidatos}
     Noticia: {text}
     """
     
     text = answer_question(question, prompt)
     
+    print(text)
+
     data = {
         "thinking": re.search(r"<thinking>(.*?)</thinking>", text, re.DOTALL).group(1).strip(),
         "tono": re.search(r"<tono>(.*?)</tono>", text).group(1).strip(),

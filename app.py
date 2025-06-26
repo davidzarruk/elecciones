@@ -66,5 +66,5 @@ def get_candidate_sentiment(event, context):
 
 if __name__ == "__main__":
 
-    scrape_semana_news({}, {})
+    get_candidate_sentiment({}, {})
 
