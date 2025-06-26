@@ -33,6 +33,14 @@ def answer_question(question, prompt_data, tokens=1000):
     return response_body
 
 
+def extract_json(text):
+    match = re.search(r'{[\s\S]*}', text)
+    if match:
+        return match.group()
+    else:
+        raise ValueError("No JSON found in the input")
+
+
 def get_sentiment(candidatos, text, prompt):
     question = f"""
     {candidatos}
@@ -41,8 +49,8 @@ def get_sentiment(candidatos, text, prompt):
     
     text = answer_question(question, prompt)
     
-    print(text)
-    data_json = json.loads(text)
+    print(extract_json(text))
+    data_json = json.loads(extract_json(text))
 
     # Access elements like this:
     print(data_json["María José Pizarro"]["thinking"]) 
