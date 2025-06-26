@@ -41,6 +41,11 @@ def get_sentiment(candidatos, text, prompt):
     
     text = answer_question(question, prompt)
     
+    data_json = json.loads(text)
+
+    # Access elements like this:
+    print(data_json["María José Pizarro"]["thinking"]) 
+
     print(text)
 
     data = {

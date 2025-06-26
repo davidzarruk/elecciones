@@ -7,6 +7,7 @@ import pandas as pd
 from bs4 import BeautifulSoup
 from datetime import datetime
 import re
+import json
 
 
 def scrape_semana_news(event, context):

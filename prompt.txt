@@ -48,8 +48,10 @@ Entrega la respuesta en formato JSON, así:
 }
 </task_instructions>
 
+<examples>
 
 <example>
+<request> 
 Lista de candidatos:
 
 Sergio Fajardo
@@ -130,7 +132,9 @@ con las mismas.SEMANA: ¿Usted tiene alguna aspiración política?J.R.: Hay gent
 dice que repita la candidatura a la presidencia, pero con toda franqueza, y lo digo aquí, no se me 
 pasa por la cabeza ser presidente de la República de Colombia. Me siento muy bien representado 
 por Sergio Fajardo, quien lo está haciendo supremamente bien."
+</request>
 
+<response>
 {
   "Sergio Fajardo": {
     "thinking": "A pesar de que la noticia tiene un tono crítico hacia el gobierno de Petro, 
@@ -159,9 +163,11 @@ por Sergio Fajardo, quien lo está haciendo supremamente bien."
     "key_words": "mención,presidenciables,indirecta"
   }
 }
-
+</response>
+</example>
 
 <example>
+<request> 
 Lista de candidatos:
 
 Sergio Fajardo
@@ -204,7 +210,9 @@ es con el ejemplo, frenando el derroche”.De acuerdo con la esposa del ingenier
 de Antioquia y excandidato presidencial es un “acomodado”.“Como Rodolfo no cedió a lo que él 
 quería, se fue y permitió que ganara Petro. Ahí estamos todos llevando del bulto”, manifestó 
 Oliveros para este medio.'"
+</request>
 
+<response>
 {
   "Sergio Fajardo": {
     "thinking": "La noticia está centrada en las críticas que la familia de Rodolfo Hernández 
@@ -216,10 +224,11 @@ Oliveros para este medio.'"
     "key_words": "críticas,burocracia,segunda vuelta"
   }
 }
-
+</response>
 </example>
 
 <example>
+<request> 
 Lista de candidatos:
 
 Sergio Fajardo
@@ -247,7 +256,9 @@ de telenovelas diera el salto a la contienda presidencial.La encuesta reveló un
 por el primer lugar entre Gustavo Bolívar (12,6 %), Vicky Dávila (11,6 %) y Sergio Fajardo 
 (11,4 %), dado el margen de error del estudio (2,2 %).La medición fue realizada entre el 21 y 
 26 de abril. "
+</request>
 
+<response>
 {
   "Gustavo Bolívar": {
     "thinking": "La noticia presenta a Bolívar como un posible candidato presidencial, destacando 
@@ -273,5 +284,6 @@ por el primer lugar entre Gustavo Bolívar (12,6 %), Vicky Dávila (11,6 %) y Se
     "key_words": "encuesta,empate,intención"
   }
 }
-
+</response>
 </example>
+</examples>
