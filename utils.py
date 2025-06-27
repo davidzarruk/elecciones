@@ -47,23 +47,21 @@ def get_sentiment(candidatos, text, prompt):
     Noticia: {text}
     """
     
-    text = answer_question(question, prompt)
+    response = answer_question(question, prompt)
     
-    print(extract_json(text))
-    data_json = json.loads(extract_json(text))
+    data_json = json.loads(extract_json(response))
 
-    # Access elements like this:
-    print(data_json["María José Pizarro"]["thinking"]) 
+    df = pd.DataFrame(data_json)
 
-    data = {
-        "thinking": re.search(r"<thinking>(.*?)</thinking>", text, re.DOTALL).group(1).strip(),
-        "tono": re.search(r"<tono>(.*?)</tono>", text).group(1).strip(),
-        "reason": re.search(r"<reason>(.*?)</reason>", text).group(1).strip(),
-        "key_words": re.search(r"<key_words>(.*?)</key_words>", text).group(1).strip()
-    }
-    
+    df_reshaped = (
+        df.stack()
+        .unstack(0)
+    ).reset_index()
+
+    df_reshaped['articleBody'] = text
+
     # Convertir a DataFrame
-    return data["thinking"], data["tono"], data["reason"], data["key_words"]
+    return df_reshaped
 
 
 def upload_df_to_s3(df, bucket_name, key):
@@ -103,7 +101,6 @@ def read_all_csvs_from_s3_folder(bucket_name, folder_prefix):
     for key in csv_keys:
         obj = s3.get_object(Bucket=bucket_name, Key=key)
         df = pd.read_csv(obj['Body'], encoding='utf-8')
-        df['source_file'] = key  # Optional: track where each row came from
         all_dfs.append(df)
 
     # Step 3: Concatenate all into a single DataFrame
