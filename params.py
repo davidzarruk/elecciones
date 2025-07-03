@@ -1,3 +1,7 @@
+ATHENA_DB = "news_db"
+ATHENA_TABLE = "news_table"
+ATHENA_OUTPUT = "s3://zarruk/athena-results/"
+
 SEMANA_NUM_NEWS = 10
 
 SEMANA_URL = "https://www.semana.com/pf/api/v3/content/fetch/content-apir"

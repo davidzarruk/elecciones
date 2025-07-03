@@ -2,12 +2,51 @@ import requests
 import json
 from utils import extract_canonical_urls, sanitize_headers, get_data, upload_df_to_s3, \
     read_all_csvs_from_s3_folder, get_sentiment, read_df_from_s3, get_propuesta
-from params import SEMANA_PARAMS, SEMANA_HEADERS, SEMANA_URL, SEMANA_NUM_NEWS
+from params import SEMANA_PARAMS, SEMANA_HEADERS, SEMANA_URL, SEMANA_NUM_NEWS, \
+    ATHENA_DB, ATHENA_TABLE, ATHENA_OUTPUT
 import pandas as pd
 from bs4 import BeautifulSoup
 from datetime import datetime
 import re
 import json
+import boto3
+
+
+def run_athena_query(query, database, output_location):
+    client = boto3.client('athena')
+    response = client.start_query_execution(
+        QueryString=query,
+        QueryExecutionContext={'Database': database},
+        ResultConfiguration={'OutputLocation': output_location}
+    )
+    return response['QueryExecutionId']
+
+
+def update_news_db(df, source_str, date_str, run_str):
+    s3_key = f"noticias-politica/source={source_str}/date={date_str}/run={run_str}/data.csv"
+
+    upload_df_to_s3(
+        df,
+        bucket_name="zarruk",
+        key=s3_key
+    )
+
+    print(f"File uploaded to: {s3_key}")
+
+    # 🔹 Ejecutar query para agregar partición a Athena
+    partition_query = f"""
+    ALTER TABLE {ATHENA_TABLE} ADD IF NOT EXISTS
+    PARTITION (source='{source_str}', date='{date_str}', run='{run_str}')
+    LOCATION 's3://zarruk/noticias-politica/source={source_str}/date={date_str}/run={run_str}/'
+    """
+
+    query_id = run_athena_query(
+        query=partition_query,
+        database=ATHENA_DB,
+        output_location=ATHENA_OUTPUT
+    )
+
+    print(f"Athena partition query submitted. QueryExecutionId: {query_id}")
 
 
 def scrape_semana_news(event, context):
@@ -37,20 +76,11 @@ def scrape_semana_news(event, context):
 
     # Generate current timestamp
     now = datetime.now()
-    date_str = now.strftime("%Y-%m-%d")    # para la partición date
-    run_str = now.strftime("%H%M")         # para la partición run (ej: "0830", "1230")
+    date_str = now.strftime("%Y-%m-%d")
+    run_str = now.strftime("%H%M")
+    source_str = "semana"
 
-    s3_key = f"noticias-politica/source=semana/date={date_str}/run={run_str}/data.csv"
-
-    # Guardar CSV en ruta particionada
-    upload_df_to_s3(
-        df,
-        bucket_name="zarruk",
-        key=s3_key
-    )
-
-    print(f"File uploaded to: {s3_key}")
-
+    update_news_db(df, source_str, date_str, run_str)
 
 
 def keep_unique_news(df_news):
