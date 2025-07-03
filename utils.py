@@ -64,6 +64,27 @@ def get_sentiment(candidatos, text, prompt):
     return df_reshaped
 
 
+
+
+
+def get_propuesta(candidatos, text, prompt, json_propuestas, fuente):
+    question = f"""
+    {candidatos}
+    JSON de propuestas: {json_propuestas}
+    Noticia: {text}
+    Fuente: {fuente}
+    """
+    
+    response = answer_question(question, prompt)
+    
+    data_json = json.loads(extract_json(response))
+
+    return data_json
+
+
+
+
+
 def upload_df_to_s3(df, bucket_name, key):
     s3 = boto3.client('s3')
     buffer = BytesIO()

@@ -1,0 +1,51 @@
+<task_instructions>
+Quiero que analices una noticia de prensa y la compares con un JSON que contiene propuestas políticas previamente recolectadas, usando también una lista específica de candidatos presidenciales en Colombia.
+
+Te entregaré cuatro elementos:
+1. Una **lista de candidatos** sobre los que me interesa saber las propuestas.
+2. Un **JSON con propuestas existentes** para esos candidatos.
+3. Una **noticia de prensa**.
+4. Una **fuente** (como string) que identifica el origen de la noticia.
+
+Tu tarea es revisar la noticia y **devolver el mismo JSON de entrada**, pero complementado únicamente donde aplique.
+
+Sigue estas instrucciones:
+
+1. Trabaja **solo con los candidatos incluidos en la lista** que te entrego. Ignora cualquier otro candidato que esté en el artículo de prensa pero no en la lista.
+
+2. Para cada candidato en la lista:
+   - Si **no es mencionado en la noticia**, **deja su entrada tal como está en el JSON de entrada**, sin cambios en sus propuestas, palabras clave o fuente.
+   - Si **sí es mencionado**, revisa si:
+     - Hay **propuestas nuevas** → agrégalas como viñetas al final de la lista `"propuestas"`.
+     - Hay **información adicional sobre propuestas ya existentes** → complementa o mejora la redacción de esas propuestas, sin repetirlas.
+     - No hay nada nuevo ni relevante → deja propuestas, palabras clave y fuente igual.
+
+3. En todos los candidatos del JSON, el campo `"thinking"` debe ser **reemplazado completamente**:
+   - Si se agregó o enriqueció información, explica paso a paso cómo lo hiciste con base en la noticia.
+   - Si **no hubo cambios**, escribe algo como: "La noticia no menciona al candidato" o "No se identificó información nueva o relevante sobre el candidato".
+
+4. En el campo `"fuente"`:
+   - Si se modificó la entrada del candidato (nuevas propuestas o enriquecimiento), **agrega la nueva fuente** (la que se te entrega) al final del campo `"fuente"`, **separada por coma**, sin eliminar las fuentes previas.
+   - Si la fuente ya aparece en ese campo, **no la repitas**.
+   - Si **no se modificó** la entrada del candidato, **conserva su valor de fuente original tal como está**.
+
+5. La lista `"propuestas"` debe reflejar tanto las propuestas ya existentes (posiblemente mejor redactadas), como las nuevas si las hay. Reformula propuestas solo si hay información adicional que las complemente.
+
+6. La clave `"key_words"` debe actualizarse si los nuevos contenidos introducen temas relevantes adicionales. Incluye tantas palabras clave como sean necesarias para reflejar el conjunto de propuestas del candidato.
+
+7. Tu respuesta debe ser un **JSON completo**, donde **todas las entradas del JSON de entrada estén presentes**, pero **solo se modifiquen** aquellas correspondientes a candidatos de la lista **que fueron mencionados en la noticia y cuya entrada fue enriquecida**.
+
+Formato esperado:
+
+{
+  "Nombre del candidato": {
+    "thinking": "explicación basada en la noticia actual o justificación de por qué no hubo cambios",
+    "propuestas": [
+      "- propuesta 1 (ya existente o enriquecida)",
+      "- nueva propuesta si aplica"
+    ],
+    "key_words": "tema1,tema2,tema3,...",
+    "fuente": "fuente_anterior, nueva_fuente"
+  }
+}
+</task_instructions>
