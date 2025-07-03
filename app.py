@@ -77,7 +77,7 @@ def scrape_semana_news(event, context):
     # Generate current timestamp
     now = datetime.now()
     date_str = now.strftime("%Y-%m-%d")
-    run_str = now.strftime("%H%M")
+    run_str = now.strftime("%H-%M")
     source_str = "semana"
 
     update_news_db(df, source_str, date_str, run_str)
