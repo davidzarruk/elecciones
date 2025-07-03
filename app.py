@@ -40,7 +40,7 @@ def scrape_semana_news(event, context):
     date_str = now.strftime("%Y-%m-%d")    # para la partición date
     run_str = now.strftime("%H%M")         # para la partición run (ej: "0830", "1230")
 
-    s3_key = f"noticias-politica/semana/date={date_str}/run={run_str}/data.csv"
+    s3_key = f"noticias-politica/source=semana/date={date_str}/run={run_str}/data.csv"
 
     # Guardar CSV en ruta particionada
     upload_df_to_s3(
