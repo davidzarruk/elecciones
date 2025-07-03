@@ -13,7 +13,7 @@ import boto3
 
 
 def run_athena_query(query, database, output_location):
-    client = boto3.client('athena')
+    client = boto3.client('athena', region_name='us-east-2')
     response = client.start_query_execution(
         QueryString=query,
         QueryExecutionContext={'Database': database},
