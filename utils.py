@@ -5,9 +5,85 @@ from io import BytesIO
 import re
 from openai import OpenAI
 import os
+import time
 
 
 client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+
+def run_athena_query(query, database, output_location):
+    client = boto3.client('athena', region_name='us-east-2')
+    response = client.start_query_execution(
+        QueryString=query,
+        QueryExecutionContext={'Database': database},
+        ResultConfiguration={'OutputLocation': output_location}
+    )
+    return response['QueryExecutionId']
+
+
+def filter_new_by_candidate_names(df, candidates):
+    names = [line.strip() for line in candidates if line.strip() and not line.lower().startswith("lista")]
+
+    pattern = '|'.join([re.escape(name) for name in names])
+    df = df[df['articleBody'].str.contains(pattern, case=False, na=False)]
+    return df
+
+
+def query_athena_to_df(query, database, output_location):
+    # Iniciar la ejecución del query
+    athena_client = boto3.client('athena', region_name='us-east-2')
+    response = athena_client.start_query_execution(
+        QueryString=query,
+        QueryExecutionContext={'Database': database},
+        ResultConfiguration={'OutputLocation': output_location}
+    )
+    query_execution_id = response['QueryExecutionId']
+
+    # Esperar a que se complete
+    while True:
+        status = athena_client.get_query_execution(QueryExecutionId=query_execution_id)
+        state = status['QueryExecution']['Status']['State']
+        if state in ['SUCCEEDED', 'FAILED', 'CANCELLED']:
+            break
+        time.sleep(2)
+
+    if state != 'SUCCEEDED':
+        raise Exception(f"Athena query failed with state: {state}")
+
+    # Construir la ruta del archivo CSV
+    result_file = f"{output_location}{query_execution_id}.csv"
+
+    # Leer el archivo en un DataFrame
+    df = pd.read_csv(result_file)
+    return df
+
+
+def update_news_db(df, folder, source_str, date_str, run_str,
+                   athena_table, athena_db, athena_output):
+    s3_key = f"{folder}/source={source_str}/date={date_str}/run={run_str}/data.csv"
+
+    upload_df_to_s3(
+        df,
+        bucket_name="zarruk",
+        key=s3_key
+    )
+
+    print(f"File uploaded to: {s3_key}")
+
+    # 🔹 Ejecutar query para agregar partición a Athena
+    partition_query = f"""
+    ALTER TABLE {athena_table} ADD IF NOT EXISTS
+    PARTITION (source='{source_str}', date='{date_str}', run='{run_str}')
+    LOCATION 's3://zarruk/{folder}/source={source_str}/date={date_str}/run={run_str}/'
+    """
+
+    query_id = run_athena_query(
+        query=partition_query,
+        database=athena_db,
+        output_location=athena_output
+    )
+
+    print(f"Athena partition query submitted. QueryExecutionId: {query_id}")
+
 
 def answer_question(question, prompt_data, tokens=1000):
     modelId = "gpt-4o"
