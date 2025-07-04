@@ -21,7 +21,18 @@ def scrape_semana_news(event, context):
     
     links = extract_canonical_urls(json.loads(response.text))
 
-    url = "https://www.semana.com/"
+    print("Getting already scraped URLs")
+    query = "SELECT DISTINCT url FROM news_table WHERE source = 'semana'"
+    df_urls = query_athena_to_df(query, "news_db", "s3://zarruk/athena-results/")
+    
+    url = "https://www.semana.com"
+    
+    if len(df_urls)>0:
+        existing_links = [link.replace(url, "") for link in df_urls['url']]
+
+        # Keep only links that have not been scraped
+        links = list(set(links) - set(existing_links))
+    
     df = pd.DataFrame()
 
     print("Scraping news...")

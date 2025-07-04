@@ -165,7 +165,7 @@ def upload_df_to_s3(df, bucket_name, key):
     s3 = boto3.client('s3')
     buffer = BytesIO()
 
-    df.to_csv(buffer, index=False, encoding='utf-8')
+    df.to_csv(buffer, index=False, header=False, encoding='utf-8')
     content_type = 'text/csv'
 
     buffer.seek(0)  # Rewind the buffer to the beginning
@@ -237,8 +237,9 @@ def get_data(soup):
     for script_tag in script_tags:
         try:
             # Load the JSON data from the script tag
-            json_data = json.loads(script_tag.string)
-
+            raw_json = script_tag.get_text()
+            json_data = json.loads(raw_json.replace('\n', '').replace('\t', ''))
+            
             # Check if the desired keys are present
             if 'datePublished' in json_data and 'headline' in json_data and 'description' in json_data:
                 # Extract the 'datePublished', 'headline', and 'description' values
