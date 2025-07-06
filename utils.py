@@ -9,7 +9,6 @@ import time
 from bs4 import BeautifulSoup
 import requests
 
-
 client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
 def run_athena_query(query, database, output_location):

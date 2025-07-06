@@ -37,12 +37,7 @@ def scrape_news(event, context):
     print("Scraping news...")
     # Perform GET requests for each filtered hyperlink
     for i, link in enumerate(links):
-            
-
-
         df_noticia = get_articles(link, source=event['source'])
-        df_noticia['url'] = link
-
         df = pd.concat([df, df_noticia])
 
     # Generate current timestamp
@@ -52,7 +47,10 @@ def scrape_news(event, context):
     source_str = event['source']
     folder = "noticias-politica"
 
-    update_news_db(df, folder, source_str, date_str, run_str, ATHENA_TABLE, ATHENA_DB, ATHENA_OUTPUT)
+    if len(df)>0:
+        update_news_db(df, folder, source_str, date_str, run_str, ATHENA_TABLE, ATHENA_DB, ATHENA_OUTPUT)
+    else:
+        print("No news to update.")
 
 
 def get_candidate_sentiment(event, context):
@@ -125,5 +123,5 @@ def get_candidate_propuestas(event, context):
 
 if __name__ == "__main__":
 
-    scrape_news({'source': 'LSV'}, {})
+    scrape_news({'source': 'semana'}, {})
 
