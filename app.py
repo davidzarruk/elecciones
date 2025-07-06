@@ -1,10 +1,9 @@
 import requests
 import json
-from utils import extract_canonical_urls, sanitize_headers, get_data, upload_df_to_s3, \
+from utils import get_links, get_articles, upload_df_to_s3, \
     get_sentiment, read_df_from_s3, get_propuesta, \
     update_news_db, query_athena_to_df, filter_new_by_candidate_names
-from params import SEMANA_PARAMS, SEMANA_HEADERS, SEMANA_URL, SEMANA_NUM_NEWS, \
-    ATHENA_DB, ATHENA_TABLE, ATHENA_OUTPUT
+from params import NUM_NEWS, QUERY_PARAMS, ATHENA_TABLE, ATHENA_DB, ATHENA_OUTPUT
 import pandas as pd
 from bs4 import BeautifulSoup
 from datetime import datetime
@@ -12,39 +11,37 @@ import re
 import json
 
 
-def scrape_semana_news(event, context):
-    
-    print(f"Getting URLs from first {SEMANA_NUM_NEWS} news to fetch...")
-    response = requests.get(SEMANA_URL,
-                            headers=sanitize_headers(SEMANA_HEADERS),
-                            params=SEMANA_PARAMS)
-    
-    links = extract_canonical_urls(json.loads(response.text))
 
-    print("Getting already scraped URLs")
-    query = "SELECT DISTINCT url FROM news_table WHERE source = 'semana'"
+def scrape_news(event, context):
+    
+    print(f"Scraping {event['source']}. Getting URLs from first {NUM_NEWS} news to fetch...")
+    response = requests.get(QUERY_PARAMS[event['source']]['api_url'],
+                            params=QUERY_PARAMS[event['source']]['params']).text
+    
+    links = get_links(response,
+                      source=event['source'],
+                      params=QUERY_PARAMS[event['source']])
+
+    print(f"Getting already scraped URLs from {event['source']}")
+    query = f"SELECT DISTINCT url FROM news_table WHERE source = '{event['source']}'"
     df_urls = query_athena_to_df(query, "news_db", "s3://zarruk/athena-results/")
-    
-    url = "https://www.semana.com"
-    
+        
     if len(df_urls)>0:
-        existing_links = [link.replace(url, "") for link in df_urls['url']]
-
         # Keep only links that have not been scraped
-        links = list(set(links) - set(existing_links))
-    
+        links = list(set(links) - set(df_urls['url']))
+
+    print(f"Total number of links to be scrapped: {len(links)}")
+
     df = pd.DataFrame()
 
     print("Scraping news...")
     # Perform GET requests for each filtered hyperlink
     for i, link in enumerate(links):
             
-        full_url = url.rstrip('/') + link  # Construct the full URL by combining the base URL with the relative link
-        link_response = requests.get(full_url)
-        
-        soup = BeautifulSoup(link_response.content, "html.parser")
-        df_noticia = get_data(soup)
-        df_noticia['url'] = full_url
+
+
+        df_noticia = get_articles(link, source=event['source'])
+        df_noticia['url'] = link
 
         df = pd.concat([df, df_noticia])
 
@@ -52,7 +49,7 @@ def scrape_semana_news(event, context):
     now = datetime.now()
     date_str = now.strftime("%Y-%m-%d")
     run_str = now.strftime("%H-%M")
-    source_str = "semana"
+    source_str = event['source']
     folder = "noticias-politica"
 
     update_news_db(df, folder, source_str, date_str, run_str, ATHENA_TABLE, ATHENA_DB, ATHENA_OUTPUT)
@@ -128,5 +125,5 @@ def get_candidate_propuestas(event, context):
 
 if __name__ == "__main__":
 
-    scrape_semana_news({}, {})
+    scrape_news({'source': 'LSV'}, {})
 

@@ -6,6 +6,8 @@ import re
 from openai import OpenAI
 import os
 import time
+from bs4 import BeautifulSoup
+import requests
 
 
 client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
@@ -205,16 +207,40 @@ def read_all_csvs_from_s3_folder(bucket_name, folder_prefix):
     return combined_df
 
 
-def extract_canonical_urls(data, urls=[]):
+def get_links(response, source, params):
+    if source == "LSV":
+        return get_links_LSV(response)
+    elif source == "semana":
+        return get_links_semana(json.loads(response), params)
+
+
+def get_links_LSV(response):
+    # Parse the HTML
+    soup = BeautifulSoup(response, 'html.parser')
+
+    # Find all article links
+    article_links = []
+    for article in soup.find_all('article'):
+        a_tag = article.find('a', href=True)
+        if a_tag:
+            article_links.append(a_tag['href'])
+
+    return list(set(article_links))
+
+
+def get_links_semana(data, params, urls=[]):
+
     if isinstance(data, dict):
         for key, value in data.items():
             if key == "canonical_url":
                 urls.append(value)
             elif isinstance(value, (dict, list)):
-                extract_canonical_urls(value, urls)
+                get_links_semana(value, params, urls=urls)
     elif isinstance(data, list):
         for item in data:
-            extract_canonical_urls(item, urls)
+            get_links_semana(item, params, urls=urls)
+
+    urls = [f"{params['base_url']}{link}" for link in urls]
 
     return urls
 
@@ -230,7 +256,48 @@ def sanitize_headers(headers):
     return safe_headers
 
 
-def get_data(soup):
+# Helper function to safely get attribute content
+def get_content(tag, attr='content'):
+    return tag.get(attr) if tag else None
+
+def get_articles(link, source):
+    if source == "LSV":
+        return get_articles_LSV(link)
+    elif source == "semana":
+        return get_articles_semana(link)
+
+
+def get_articles_LSV(link):
+    link_response = requests.get(link)
+    soup = BeautifulSoup(link_response.content, "html.parser")
+
+    # Extract article data into dictionary
+    article_data = {
+        "date_published": get_content(soup.find("meta", property="article:published_time")),
+        "link": link,
+        "headline": get_content(soup.find("meta", property="og:title")),
+        "articleBody": " ".join([
+            p.get_text(strip=True)
+            for p in soup.find("div", class_="entry-content").find_all("p")
+        ]),
+        "description": get_content(soup.find("meta", attrs={"name": "description"})),
+        "dateModified": get_content(soup.find("meta", property="article:modified_time")),
+        "dateline": "",
+        "alternativeHeadline": "",
+        "keywords": "",
+        "articleSection": ""
+    }
+
+    # Create DataFrame
+    df = pd.DataFrame([article_data])  # Wrap in list to create one-row DataFrame
+
+    return df
+
+
+def get_articles_semana(link):
+    link_response = requests.get(link)
+    soup = BeautifulSoup(link_response.content, "html.parser")
+
     # Find all the script tags with type="application/ld+json"
     script_tags = soup.find_all('script', {'type': 'application/ld+json'})
 
@@ -269,9 +336,10 @@ def get_data(soup):
             pass
     
     df = pd.DataFrame({
-                    'articleBody': [articleBody],
                     'date_published': [date_published],
+                    'link': [link],
                     'headline': [headline],
+                    'articleBody': [articleBody],
                     'description': [description],
                     'dateModified': [dateModified],
                     'dateline': [dateline],
