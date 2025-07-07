@@ -267,9 +267,9 @@ def get_articles(link, session, source):
 
 
 def get_articles_LSV(link, session):
+    print(f"Started request for article: {link}")
     link_response = session.get(link)
     soup = BeautifulSoup(link_response.content, "html.parser")
-
     print(f"Got data for article: {link}")
 
     # Extract article data into dictionary
@@ -296,9 +296,9 @@ def get_articles_LSV(link, session):
 
 
 def get_articles_semana(link, session):
+    print(f"Started request for article: {link}")
     link_response = session.get(link)
     soup = BeautifulSoup(link_response.content, "html.parser")
-
     print(f"Got data for article: {link}")
 
     # Find all the script tags with type="application/ld+json"
