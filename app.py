@@ -40,7 +40,6 @@ def scrape_news(event, context):
     print("Scraping news...")
     # Perform GET requests for each filtered hyperlink
     for i, link in enumerate(links):
-        print(f"Scraping news article #{i+1}...")
         df_noticia = get_articles(link, session=session, source=event['source'])
         df = pd.concat([df, df_noticia])
 

@@ -11,7 +11,6 @@ import requests
 
 client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
-
 def run_athena_query(query, database, output_location):
     client = boto3.client('athena', region_name='us-east-2')
     response = client.start_query_execution(
@@ -271,6 +270,8 @@ def get_articles_LSV(link, session):
     link_response = session.get(link)
     soup = BeautifulSoup(link_response.content, "html.parser")
 
+    print(f"Got data for article: {link}")
+
     # Extract article data into dictionary
     article_data = {
         "date_published": get_content(soup.find("meta", property="article:published_time")),
@@ -297,6 +298,8 @@ def get_articles_LSV(link, session):
 def get_articles_semana(link, session):
     link_response = session.get(link)
     soup = BeautifulSoup(link_response.content, "html.parser")
+
+    print(f"Got data for article: {link}")
 
     # Find all the script tags with type="application/ld+json"
     script_tags = soup.find_all('script', {'type': 'application/ld+json'})
