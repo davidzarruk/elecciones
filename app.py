@@ -13,10 +13,13 @@ import json
 
 
 def scrape_news(event, context):
-    
+
+    # Start requests session
+    session = requests.Session()
+
     print(f"Scraping {event['source']}. Getting URLs from first {NUM_NEWS} news to fetch...")
-    response = requests.get(QUERY_PARAMS[event['source']]['api_url'],
-                            params=QUERY_PARAMS[event['source']]['params']).text
+    response = session.get(QUERY_PARAMS[event['source']]['api_url'],
+                           params=QUERY_PARAMS[event['source']]['params']).text
     
     links = get_links(response,
                       source=event['source'],
@@ -38,7 +41,7 @@ def scrape_news(event, context):
     # Perform GET requests for each filtered hyperlink
     for i, link in enumerate(links):
         print(f"Scraping news article #{i+1}...")
-        df_noticia = get_articles(link, source=event['source'])
+        df_noticia = get_articles(link, session=session, source=event['source'])
         df = pd.concat([df, df_noticia])
 
     # Generate current timestamp
@@ -124,5 +127,5 @@ def get_candidate_propuestas(event, context):
 
 if __name__ == "__main__":
 
-    scrape_news({'source': 'semana'}, {})
+    scrape_news({'source': 'LSV'}, {})
 

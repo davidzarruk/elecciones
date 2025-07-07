@@ -11,6 +11,7 @@ import requests
 
 client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
+
 def run_athena_query(query, database, output_location):
     client = boto3.client('athena', region_name='us-east-2')
     response = client.start_query_execution(
@@ -259,15 +260,15 @@ def sanitize_headers(headers):
 def get_content(tag, attr='content'):
     return tag.get(attr) if tag else None
 
-def get_articles(link, source):
+def get_articles(link, session, source):
     if source == "LSV":
-        return get_articles_LSV(link)
+        return get_articles_LSV(link, session)
     elif source == "semana":
-        return get_articles_semana(link)
+        return get_articles_semana(link, session)
 
 
-def get_articles_LSV(link):
-    link_response = requests.get(link)
+def get_articles_LSV(link, session):
+    link_response = session.get(link)
     soup = BeautifulSoup(link_response.content, "html.parser")
 
     # Extract article data into dictionary
@@ -293,8 +294,8 @@ def get_articles_LSV(link):
     return df
 
 
-def get_articles_semana(link):
-    link_response = requests.get(link)
+def get_articles_semana(link, session):
+    link_response = session.get(link)
     soup = BeautifulSoup(link_response.content, "html.parser")
 
     # Find all the script tags with type="application/ld+json"
