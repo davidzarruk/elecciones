@@ -24,7 +24,7 @@ def scrape_news(event, context):
     links = get_links(response,
                       source=event['source'],
                       params=QUERY_PARAMS[event['source']])
-
+    
     print(f"Getting already scraped URLs from {event['source']}")
     query = f"SELECT DISTINCT url FROM news_table WHERE source = '{event['source']}'"
     df_urls = query_athena_to_df(query, "news_db", "s3://zarruk/athena-results/")
@@ -126,5 +126,5 @@ def get_candidate_propuestas(event, context):
 
 if __name__ == "__main__":
 
-    scrape_news({'source': 'elespectador'}, {})
+    scrape_news({'source': 'wradio'}, {})
 

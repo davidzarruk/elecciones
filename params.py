@@ -19,6 +19,11 @@ QUERY_PARAMS = {
         'params': {},
         'api_url': "https://www.lasillavacia.com/"
     },
+    'wradio': {
+        'params': {},
+        'api_url': "https://www.wradio.com.co/",
+        'base_url': "https://www.wradio.com.co"
+    },
     'elespectador': {
         'params': {
             "query": (
