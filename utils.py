@@ -211,6 +211,8 @@ def get_links(response, source, params):
         return get_links_LSV(response)
     elif source == "semana":
         return get_links_semana(json.loads(response), params)
+    elif source == "elespectador":
+        return get_links_elespectador(response, params)
 
 
 def get_links_LSV(response):
@@ -225,6 +227,20 @@ def get_links_LSV(response):
             article_links.append(a_tag['href'])
 
     return list(set(article_links))
+
+
+def get_links_elespectador(response, params):
+    # Extract all hrefs that start with "/politica"
+    links = []
+    elements = json.loads(response)['content_elements']
+    for element in elements:
+        links.append(element['canonical_url'])
+
+    # Remove duplicates if needed
+    links = list(set(links))
+    
+    links = [f"{params['base_url']}{link}" for link in links]
+    return links
 
 
 def get_links_semana(data, params, urls=[]):
@@ -264,6 +280,8 @@ def get_articles(link, session, source):
         return get_articles_LSV(link, session)
     elif source == "semana":
         return get_articles_semana(link, session)
+    elif source == "elespectador":
+        return get_articles_elespectador(link, session)
 
 
 def get_articles_LSV(link, session):
@@ -348,6 +366,61 @@ def get_articles_semana(link, session):
                     'dateline': [dateline],
                     'alternativeHeadline': [alternativeHeadline],
                     'keywords': [keywords],
+                    'articleSection': [articleSection]
+                    })
+    
+    return df
+
+
+def get_articles_elespectador(link, session):
+    print(f"Started request for article: {link}")
+    link_response = session.get(link)
+    soup = BeautifulSoup(link_response.content, "html.parser")
+    print(f"Got data for article: {link}")
+
+    # Find all the script tags with type="application/ld+json"
+    script_tags = soup.find_all('script', {'type': 'application/ld+json'})
+
+    for script_tag in script_tags:
+        try:
+            # Load the JSON data from the script tag
+            raw_json = script_tag.get_text()
+            json_data = json.loads(raw_json.replace('\n', '').replace('\t', ''))
+            
+            # Check if the desired keys are present
+            if 'datePublished' in json_data and 'headline' in json_data and 'description' in json_data:
+                # Extract the 'datePublished', 'headline', and 'description' values
+                date_published = json_data['datePublished']
+                headline = json_data['headline']
+                description = json_data['description']
+                dateModified = json_data["dateModified"]
+                alternativeHeadline = json_data["alternativeHeadline"]
+                articleSection = json_data["articleSection"]
+                articleBody = json_data["articleBody"]
+
+                break
+                
+        except json.JSONDecodeError:
+            # Skip this script tag if there's an error decoding JSON
+            date_published = 'NA'
+            headline = 'NA'
+            description = 'NA'
+            articleBody = 'NA'
+            dateModified = 'NA'
+            alternativeHeadline = 'NA'
+            articleSection = 'NA'
+            pass
+    
+    df = pd.DataFrame({
+                    'date_published': [date_published],
+                    'link': [link],
+                    'headline': [headline],
+                    'articleBody': [articleBody],
+                    'description': [description],
+                    'dateModified': [dateModified],
+                    'dateline': [""],
+                    'alternativeHeadline': [alternativeHeadline],
+                    'keywords': [""],
                     'articleSection': [articleSection]
                     })
     

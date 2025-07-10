@@ -126,5 +126,5 @@ def get_candidate_propuestas(event, context):
 
 if __name__ == "__main__":
 
-    scrape_news({'source': 'LSV'}, {})
+    scrape_news({'source': 'elespectador'}, {})
 

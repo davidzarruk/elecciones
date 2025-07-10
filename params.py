@@ -18,5 +18,25 @@ QUERY_PARAMS = {
     'LSV': {
         'params': {},
         'api_url': "https://www.lasillavacia.com/"
+    },
+    'elespectador': {
+        'params': {
+            "query": (
+                    '{"section":"/politica",'
+                    '"site":"el-espectador",'
+                    '"size":' + str(NUM_NEWS) + ','
+                    '"sourceInclude":"_id,canonical_url,headlines.basic,'
+                    'taxonomy.primary_section._id,taxonomy.primary_section.name,'
+                    'display_date,label,credits.by.name,credits.by._id,'
+                    'taxonomy.tags.slug,promo_items.basic,subtype,description.basic,'
+                    'credits.by.additional_properties.original,'
+                    'promo_items.jw_player,promo_items.youtube"}'
+                ),
+                "d": "1057",
+                "mxId": "00000000",
+                "_website": "el-espectador"
+        },
+        'api_url': "https://www.elespectador.com/pf/api/v3/content/fetch/general",
+        'base_url': "https://www.elespectador.com"
     }
 }
