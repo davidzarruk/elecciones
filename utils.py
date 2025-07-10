@@ -234,7 +234,7 @@ def get_links_wradio(response, params):
     soup = BeautifulSoup(response, "html.parser")
     all_links = soup.find_all('a')
     links = [f'{params["base_url"]}{a.get("href")}' for a in all_links if a.get("href", "").startswith("/2025/")]
-    return links
+    return list(set(links))
 
 
 def get_links_elespectador(response, params):
