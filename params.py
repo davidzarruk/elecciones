@@ -13,16 +13,33 @@ QUERY_PARAMS = {
             "_website": "semana"
         },
         'api_url': "https://www.semana.com/pf/api/v3/content/fetch/content-apir",
-        'base_url': "https://www.semana.com"
+        'base_url': "https://www.semana.com",
+        'headers': {}
     },
     'LSV': {
         'params': {},
-        'api_url': "https://www.lasillavacia.com/"
+        'api_url': "https://www.lasillavacia.com/",
+        'headers': {}
+
     },
     'wradio': {
         'params': {},
         'api_url': "https://www.wradio.com.co/",
-        'base_url': "https://www.wradio.com.co"
+        'base_url': "https://www.wradio.com.co",
+        'headers': {
+            "Host": "www.wradio.com.co",
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:139.0) Gecko/20100101 Firefox/139.0",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language": "en-US,en;q=0.5",
+            "Accept-Encoding": "gzip, deflate, br, zstd",
+            "Upgrade-Insecure-Requests": "1",
+            "Sec-Fetch-Dest": "document",
+            "Sec-Fetch-Mode": "navigate",
+            "Sec-Fetch-Site": "none",
+            "Sec-Fetch-User": "?1",
+            "Connection": "keep-alive"
+        }
+
     },
     'elespectador': {
         'params': {
@@ -42,6 +59,8 @@ QUERY_PARAMS = {
                 "_website": "el-espectador"
         },
         'api_url': "https://www.elespectador.com/pf/api/v3/content/fetch/general",
-        'base_url': "https://www.elespectador.com"
+        'base_url': "https://www.elespectador.com",
+        'headers': {}
+
     }
 }

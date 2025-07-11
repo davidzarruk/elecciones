@@ -19,7 +19,8 @@ def scrape_news(event, context):
 
     print(f"Scraping {event['source']}. Getting URLs from first {NUM_NEWS} news to fetch...")
     response = session.get(QUERY_PARAMS[event['source']]['api_url'],
-                           params=QUERY_PARAMS[event['source']]['params']).text
+                           params=QUERY_PARAMS[event['source']]['params'],
+                           headers=QUERY_PARAMS[event['source']]['headers']).text
     
     links = get_links(response,
                       source=event['source'],
