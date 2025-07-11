@@ -41,6 +41,13 @@ QUERY_PARAMS = {
         }
 
     },
+    'caracol': {
+        'params': {},
+        'api_url': "https://caracol.com.co/",
+        'base_url': "https://caracol.com.co",
+        'headers': {}
+
+    },
     'elespectador': {
         'params': {
             "query": (

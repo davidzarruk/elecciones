@@ -215,6 +215,8 @@ def get_links(response, source, params):
         return get_links_elespectador(response, params)
     elif source == "wradio":
         return get_links_wradio(response, params)
+    elif source == "caracol":
+        return get_links_wradio(response, params)
 
 
 def get_links_LSV(response):
@@ -291,6 +293,8 @@ def get_articles(link, session, source):
     elif source == "elespectador":
         return get_articles_elespectador(link, session)
     elif source == "wradio":
+        return get_articles_wradio(link, session)
+    elif source == "caracol":
         return get_articles_wradio(link, session)
 
 
