@@ -11,6 +11,7 @@ import requests
 
 client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
+
 def run_athena_query(query, database, output_location):
     client = boto3.client('athena', region_name='us-east-2')
     response = client.start_query_execution(
@@ -25,7 +26,7 @@ def filter_new_by_candidate_names(df, candidates):
     names = [line.strip() for line in candidates if line.strip() and not line.lower().startswith("lista")]
 
     pattern = '|'.join([re.escape(name) for name in names])
-    df = df[df['articleBody'].str.contains(pattern, case=False, na=False)]
+    df = df[df['articlebody'].str.contains(pattern, case=False, na=False)]
     return df
 
 
@@ -125,6 +126,7 @@ def get_sentiment(candidatos, text, prompt):
     """
     
     response = answer_question(question, prompt)
+    print(response)
     
     data_json = json.loads(extract_json(response))
 
@@ -135,12 +137,38 @@ def get_sentiment(candidatos, text, prompt):
         .unstack(0)
     ).reset_index()
 
-    df_reshaped['articleBody'] = text
+    df_reshaped['articlebody'] = text
 
     # Convertir a DataFrame
     return df_reshaped
 
 
+def update_sentiment_db(df, folder, date_str, run_str,
+                        athena_table, athena_db, athena_output):
+    s3_key = f"{folder}/date={date_str}/run={run_str}/data.csv"
+
+    upload_df_to_s3(
+        df,
+        bucket_name="zarruk",
+        key=s3_key
+    )
+
+    print(f"File uploaded to: {s3_key}")
+
+    # 🔹 Ejecutar query para agregar partición a Athena
+    partition_query = f"""
+    ALTER TABLE {athena_table} ADD IF NOT EXISTS
+    PARTITION (date='{date_str}', run='{run_str}')
+    LOCATION 's3://zarruk/{folder}/date={date_str}/run={run_str}/'
+    """
+
+    query_id = run_athena_query(
+        query=partition_query,
+        database=athena_db,
+        output_location=athena_output
+    )
+
+    print(f"Athena partition query submitted. QueryExecutionId: {query_id}")
 
 
 
