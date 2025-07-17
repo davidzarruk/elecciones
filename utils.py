@@ -501,3 +501,52 @@ def get_articles_elespectador(link, session):
                     })
     
     return df
+
+
+def get_df_from_queue(queue_url):
+    sqs = boto3.client('sqs')
+    
+    all_messages = []
+    delete_entries = []
+
+    while True:
+        response = sqs.receive_message(
+            QueueUrl=queue_url,
+            MaxNumberOfMessages=10,
+            WaitTimeSeconds=1
+        )
+
+        messages = response.get('Messages', [])
+        if not messages:
+            break
+
+        for msg in messages:
+            body = json.loads(msg['Body'])
+            all_messages.append(body)
+
+            delete_entries.append({
+                'Id': msg['MessageId'],
+                'ReceiptHandle': msg['ReceiptHandle']
+            })
+
+        # Delete processed messages
+        if delete_entries:
+            sqs.delete_message_batch(
+                QueueUrl=queue_url,
+                Entries=delete_entries
+            )
+            delete_entries.clear()
+
+    if not all_messages:
+        return pd.DataFrame()
+
+    # Convert to DataFrame
+    df = pd.DataFrame(all_messages)
+
+    # Ensure all columns exist
+    expected_columns = ['proposal_id', 'nombre', 'correo', 'propuesta', 'submitted_at']
+    for col in expected_columns:
+        if col not in df.columns:
+            df[col] = None
+
+    return df

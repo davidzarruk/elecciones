@@ -2,14 +2,16 @@ import requests
 import json
 from utils import get_links, get_articles, update_db, \
     get_sentiment, read_df_from_s3, get_propuesta, \
-    query_athena_to_df, filter_new_by_candidate_names
-from params import NUM_NEWS, QUERY_PARAMS, ATHENA_TABLE, ATHENA_DB, ATHENA_OUTPUT
+    query_athena_to_df, filter_new_by_candidate_names, get_df_from_queue
+from params import NUM_NEWS, QUERY_PARAMS, ATHENA_TABLE, ATHENA_DB, ATHENA_OUTPUT, QUEUE_URL
 import pandas as pd
 from bs4 import BeautifulSoup
 from datetime import datetime
 import re
 import json
-
+import boto3
+import uuid
+import io
 
 
 def scrape_news(event, context):
@@ -135,8 +137,55 @@ def get_candidate_propuestas(event, context):
 
 
 
+def queue_proposal(event, context):
+    sqs = boto3.client('sqs')
+
+    message = {
+        "proposal_id": str(uuid.uuid4()),
+        "nombre": event['nombre'],
+        "correo": event['correo'],
+        "propuesta": event['propuesta'],
+        "submitted_at": datetime.utcnow().isoformat()
+    }
+    
+    sqs.send_message(
+        QueueUrl=QUEUE_URL,
+        MessageBody=json.dumps(message)
+    )
+    
+    print("Proposal submitted successfully")
+
+
+
+def batch_scheduler_propuestas(event, context):
+    s3 = boto3.client('s3')
+
+    df = get_df_from_queue(QUEUE_URL)
+
+    if len(df)>0:
+        # Create CSV in memory
+        csv_buffer = io.StringIO()
+        df.to_csv(csv_buffer, index=False)
+
+        # Save to S3 (organized by date/hour)
+        now = datetime.utcnow()
+        dt = now.strftime('%Y-%m-%d')
+        hr = now.strftime('%H')
+        s3_key = f"proposals/date={dt}/hour={hr}/proposals.csv"
+
+        s3.put_object(Bucket="zarruk", Key=s3_key, Body=csv_buffer.getvalue())
+
+        print(f"Stored {len(df)} proposals to {s3_key}")
+    else:
+        print(f"No new proposals to store")
+
+
 
 if __name__ == "__main__":
 
-    scrape_news({'source': 'semana'}, {})
+#    queue_proposal({'propuesta': 'prueba 1',
+#                    'nombre': 'david',
+#                    'correo': 'correo_prueba'}, {})
+
+    batch_scheduler_propuestas({}, {})
 

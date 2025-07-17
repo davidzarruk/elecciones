@@ -3,6 +3,7 @@ import os
 ATHENA_DB = "news_db"
 ATHENA_TABLE = "news_table"
 ATHENA_OUTPUT = "s3://zarruk/athena-results/"
+QUEUE_URL = f"{os.environ['QUEUE_URL']}"
 
 NUM_NEWS = 100
 
