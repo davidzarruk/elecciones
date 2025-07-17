@@ -10,7 +10,7 @@ QUERY_PARAMS = {
     'semana': {
         'params': {
             "query": '{"feedOffset":9,"feedSize":'+str(NUM_NEWS)+',"includeSections":"politica","sourceInclude":"canonical_url,_id,promo_items,headlines.basic,subheadlines.basic,description.basic,subtype,publish_date,taxonomy,copyright"}',
-            "d": f"{os.environ["SEMANA_d_param"]}",
+            "d": f"{os.environ['SEMANA_d_param']}",
             "mxId": "00000000",
             "_website": "semana"
         },

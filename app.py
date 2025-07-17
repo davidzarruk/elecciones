@@ -1,8 +1,8 @@
 import requests
 import json
-from utils import get_links, get_articles, update_sentiment_db, \
+from utils import get_links, get_articles, update_db, \
     get_sentiment, read_df_from_s3, get_propuesta, \
-    update_news_db, query_athena_to_df, filter_new_by_candidate_names
+    query_athena_to_df, filter_new_by_candidate_names
 from params import NUM_NEWS, QUERY_PARAMS, ATHENA_TABLE, ATHENA_DB, ATHENA_OUTPUT
 import pandas as pd
 from bs4 import BeautifulSoup
@@ -54,7 +54,9 @@ def scrape_news(event, context):
     folder = "noticias-politica"
 
     if len(df)>0:
-        update_news_db(df, folder, source_str, date_str, run_str, ATHENA_TABLE, ATHENA_DB, ATHENA_OUTPUT)
+        update_db(df, folder,
+                  ATHENA_TABLE, ATHENA_DB, ATHENA_OUTPUT, 
+                  date_str, run_str, source_str)
     else:
         print("No news to update.")
 
@@ -102,9 +104,9 @@ def get_candidate_sentiment(event, context):
         date_str = now.strftime("%Y-%m-%d")
         run_str = now.strftime("%H-%M")
 
-        update_sentiment_db(df_all_sentiments, 
-                            'sentiments-news-table', date_str, run_str,
-                            'sentiments_table', ATHENA_DB, ATHENA_OUTPUT)
+        update_db(df_all_sentiments, 'sentiments-news-table',
+                  'sentiments_table', ATHENA_DB, ATHENA_OUTPUT, 
+                  date_str, run_str)
         
     else:
         print("No sentiments to update...")
