@@ -65,20 +65,17 @@ def get_candidate_sentiment(event, context):
         candidates = f.readlines()
     
     print("Reading cleaned news")
-    query = "SELECT DISTINCT * FROM news_table"
+    query = """
+    SELECT DISTINCT *
+    FROM news_table
+    where url not in (SELECT DISTINCT url
+                      FROM sentiments_table)
+    """
+
     database = "news_db"
     output_location = "s3://zarruk/athena-results/"
 
     df = query_athena_to_df(query, database, output_location)
-
-    print(f"Getting news for which sentiment was already analyzed")
-    query = f"SELECT DISTINCT url FROM sentiments_table"
-    df_urls = query_athena_to_df(query, "news_db", "s3://zarruk/athena-results/")
-        
-    if len(df_urls)>0:
-        # Keep only links that have not been scraped
-        links = list(set(df['url']) - set(df_urls['url']))
-        df = df[df['url'].isin(links)]
 
     print("Filtering by candidates")
     df = filter_new_by_candidate_names(df, candidates)
