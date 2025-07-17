@@ -22,6 +22,8 @@ def scrape_news(event, context):
                            params=QUERY_PARAMS[event['source']]['params'],
                            headers=QUERY_PARAMS[event['source']]['headers']).text
     
+    print(response)
+    
     links = get_links(response,
                       source=event['source'],
                       params=QUERY_PARAMS[event['source']])
@@ -137,5 +139,5 @@ def get_candidate_propuestas(event, context):
 
 if __name__ == "__main__":
 
-    get_candidate_sentiment({'source': 'caracol'}, {})
+    scrape_news({'source': 'semana'}, {})
 

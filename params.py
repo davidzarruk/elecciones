@@ -1,3 +1,5 @@
+import os
+
 ATHENA_DB = "news_db"
 ATHENA_TABLE = "news_table"
 ATHENA_OUTPUT = "s3://zarruk/athena-results/"
@@ -8,7 +10,7 @@ QUERY_PARAMS = {
     'semana': {
         'params': {
             "query": '{"feedOffset":9,"feedSize":'+str(NUM_NEWS)+',"includeSections":"politica","sourceInclude":"canonical_url,_id,promo_items,headlines.basic,subheadlines.basic,description.basic,subtype,publish_date,taxonomy,copyright"}',
-            "d": "7730",
+            "d": f"{os.environ["SEMANA_d_param"]}",
             "mxId": "00000000",
             "_website": "semana"
         },
