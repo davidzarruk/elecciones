@@ -155,6 +155,8 @@ def queue_proposal(event, context):
     
     print("Proposal submitted successfully")
 
+    batch_scheduler_propuestas({}, {})
+
 
 
 def batch_scheduler_propuestas(event, context):
