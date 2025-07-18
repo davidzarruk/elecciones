@@ -2,8 +2,9 @@ import requests
 import json
 from utils import get_links, get_articles, update_db, \
     get_sentiment, read_df_from_s3, get_propuesta, \
-    query_athena_to_df, filter_new_by_candidate_names, get_df_from_queue
-from params import NUM_NEWS, QUERY_PARAMS, ATHENA_TABLE, ATHENA_DB, ATHENA_OUTPUT, QUEUE_URL
+    query_athena_to_df, filter_new_by_candidate_names, send_gmail, batch_scheduler_propuestas
+from params import NUM_NEWS, QUERY_PARAMS, ATHENA_TABLE, ATHENA_DB, ATHENA_OUTPUT, QUEUE_URL, \
+    SUBJECT_EMAIL, CONTENT_EMAIL
 import pandas as pd
 from bs4 import BeautifulSoup
 from datetime import datetime
@@ -12,7 +13,7 @@ import json
 import boto3
 import uuid
 import io
-
+import os
 
 def scrape_news(event, context):
 
@@ -155,39 +156,20 @@ def queue_proposal(event, context):
     
     print("Proposal submitted successfully")
 
-    batch_scheduler_propuestas(purge_queue=False)
+    batch_scheduler_propuestas(QUEUE_URL, purge_queue=False)
 
-
-
-def batch_scheduler_propuestas(purge_queue):
-    s3 = boto3.client('s3')
-
-    df = get_df_from_queue(QUEUE_URL, purge_queue=False)
-
-    if len(df)>0:
-        # Create CSV in memory
-        csv_buffer = io.StringIO()
-        df.to_csv(csv_buffer, index=False)
-
-        # Save to S3 (organized by date/hour)
-        now = datetime.utcnow()
-        dt = now.strftime('%Y-%m-%d')
-        hr = now.strftime('%H')
-        s3_key = f"proposals/date={dt}/hour={hr}/proposals.csv"
-
-        s3.put_object(Bucket="zarruk", Key=s3_key, Body=csv_buffer.getvalue())
-
-        print(f"Stored {len(df)} proposals to {s3_key}")
-    else:
-        print(f"No new proposals to store")
+    send_gmail(event['correo'],
+               SUBJECT_EMAIL,
+               SUBJECT_EMAIL)
 
 
 
 if __name__ == "__main__":
 
-#    queue_proposal({'propuesta': 'prueba 1',
-#                    'nombre': 'david',
-#                    'correo': 'correo_prueba'}, {})
+    queue_proposal({'propuesta': 'prueba 1',
+                    'nombre': 'david',
+                    'correo': 'davidzarruk@gmail.com'}, {})
 
-    batch_scheduler_propuestas({}, {})
+#    batch_scheduler_propuestas({}, {})
 
+    

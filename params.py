@@ -74,3 +74,7 @@ QUERY_PARAMS = {
 
     }
 }
+
+
+SUBJECT_EMAIL = "¡Gracias por tu propuesta!"
+CONTENT_EMAIL = "Muchas gracias por enviarnos tu propuesta. La estaremos revisando."

@@ -8,6 +8,17 @@ import os
 import time
 from bs4 import BeautifulSoup
 import requests
+import base64
+import json
+import requests
+from datetime import datetime
+import io
+import os
+import base64
+import requests
+from email.mime.text import MIMEText
+from email.header import Header
+from email.utils import formataddr
 
 
 client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
@@ -551,3 +562,74 @@ def get_df_from_queue(queue_url, purge_queue=True):
             df[col] = None
 
     return df
+
+def get_access_token():
+    """
+    Use the refresh token to get a new access token from Google OAuth.
+    """
+    TOKEN_URI = 'https://oauth2.googleapis.com/token'
+    payload = {
+        'client_id': os.environ["CLIENT_ID"],
+        'client_secret': os.environ["CLIENT_SECRET"],
+        'refresh_token': os.environ["REFRESH_TOKEN"],
+        'grant_type': 'refresh_token',
+    }
+
+    response = requests.post(TOKEN_URI, data=payload)
+    response.raise_for_status()
+    access_token = response.json().get('access_token')
+    return access_token
+
+
+def send_gmail(to_email, subject, body_text):
+    access_token = get_access_token()
+
+    # Properly encode subject with UTF-8 using email.mime
+    message = MIMEText(body_text, 'plain', 'utf-8')
+    message['To'] = to_email
+    message['From'] = formataddr((str(Header('Propuestas Fajardo', 'utf-8')), 'me'))
+    message['Subject'] = str(Header(subject, 'utf-8'))
+
+    # Encode message
+    raw_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
+
+    # Send via Gmail API
+    url = 'https://gmail.googleapis.com/gmail/v1/users/me/messages/send'
+    headers = {
+        'Authorization': f'Bearer {access_token}',
+        'Content-Type': 'application/json'
+    }
+    body = {
+        'raw': raw_message
+    }
+
+    response = requests.post(url, headers=headers, json=body)
+    if response.status_code != 200:
+        print("Gmail API Error:", response.text)
+        raise Exception("Failed to send email")
+
+    print("Email sent successfully.")
+    return response.json()
+
+
+def batch_scheduler_propuestas(queue_url, purge_queue):
+    s3 = boto3.client('s3')
+
+    df = get_df_from_queue(queue_url, purge_queue=False)
+
+    if len(df)>0:
+        # Create CSV in memory
+        csv_buffer = io.StringIO()
+        df.to_csv(csv_buffer, index=False)
+
+        # Save to S3 (organized by date/hour)
+        now = datetime.utcnow()
+        dt = now.strftime('%Y-%m-%d')
+        hr = now.strftime('%H')
+        s3_key = f"proposals/date={dt}/hour={hr}/proposals.csv"
+
+        s3.put_object(Bucket="zarruk", Key=s3_key, Body=csv_buffer.getvalue())
+
+        print(f"Stored {len(df)} proposals to {s3_key}")
+    else:
+        print(f"No new proposals to store")
