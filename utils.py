@@ -503,7 +503,7 @@ def get_articles_elespectador(link, session):
     return df
 
 
-def get_df_from_queue(queue_url):
+def get_df_from_queue(queue_url, purge_queue=True):
     sqs = boto3.client('sqs')
     
     all_messages = []
@@ -524,10 +524,11 @@ def get_df_from_queue(queue_url):
             body = json.loads(msg['Body'])
             all_messages.append(body)
 
-            delete_entries.append({
-                'Id': msg['MessageId'],
-                'ReceiptHandle': msg['ReceiptHandle']
-            })
+            if purge_queue:
+                delete_entries.append({
+                    'Id': msg['MessageId'],
+                    'ReceiptHandle': msg['ReceiptHandle']
+                })
 
         # Delete processed messages
         if delete_entries:

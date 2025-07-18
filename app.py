@@ -155,14 +155,14 @@ def queue_proposal(event, context):
     
     print("Proposal submitted successfully")
 
-    batch_scheduler_propuestas({}, {})
+    batch_scheduler_propuestas(purge_queue=False)
 
 
 
-def batch_scheduler_propuestas(event, context):
+def batch_scheduler_propuestas(purge_queue):
     s3 = boto3.client('s3')
 
-    df = get_df_from_queue(QUEUE_URL)
+    df = get_df_from_queue(QUEUE_URL, purge_queue=False)
 
     if len(df)>0:
         # Create CSV in memory
