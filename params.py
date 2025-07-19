@@ -75,6 +75,38 @@ QUERY_PARAMS = {
     }
 }
 
+SUBJECT_EMAIL = [
+    "{}, ¡gracias por tu propuesta!",
+    "{}, recibimos tu propuesta con gusto",
+    "{}, tu voz cuenta — gracias por participar",
+    "{}, estamos revisando tu propuesta",
+    "{}, agradecemos tu aporte",
+    "{}, ¡qué bueno recibir tu propuesta!",
+    "{}, gracias por compartir tus ideas",
+    "{}, tu propuesta es valiosa para nosotros",
+    "{}, gracias por escribirnos",
+    "{}, estamos leyendo tu propuesta con atención"
+]
 
-SUBJECT_EMAIL = "¡Gracias por tu propuesta!"
-CONTENT_EMAIL = "Muchas gracias por enviarnos tu propuesta. La estaremos revisando."
+RESPUESTAS_CORREO = [
+    "Hola {},\n\nGracias por compartir tu propuesta. La vamos a revisar con mucho cuidado y, si podemos integrarla al programa de gobierno, nos comunicaremos contigo.\n\n¡Gracias por ser parte de este proceso!\n\nUn saludo,\n{}",
+    "Hola {},\n\nRecibimos tu propuesta y te agradecemos por tomarte el tiempo de enviarla. La vamos a considerar y te avisaremos si podemos incluirla en el plan de gobierno.\n\n¡Gracias por sumarte!\n\nSaludos,\n{}",
+    "Hola {},\n\nMil gracias por tu propuesta. Nos alegra saber que quieres aportar ideas. La revisaremos con atención y, si encaja en el programa, te lo haremos saber.\n\nUn abrazo,\n{}",
+    "Hola {},\n\nTe agradecemos mucho por enviarnos tu propuesta. Será parte del análisis que estamos haciendo para construir un proyecto colectivo. Si logramos incluirla, te lo contaremos.\n\nGracias por tu voz,\n{}",
+    "Hola {},\n\nRecibimos tu propuesta y te damos las gracias por sumarte con tus ideas. Vamos a revisarla y, si es posible incorporarla, nos pondremos en contacto.\n\nSeguimos construyendo juntos,\n{}",
+    "Hola {},\n\nGracias por tu mensaje y por aportar al proyecto. Cada propuesta cuenta, y la tuya será tenida en cuenta en este proceso de revisión. Si podemos incluirla, te avisamos.\n\nUn saludo grande,\n{}",
+    "Hola {},\n\nApreciamos mucho tu participación. Tu propuesta ya está en nuestras manos y será analizada con el mismo cuidado que todas. Si logramos incorporarla, te escribiremos.\n\nGracias por construir con nosotros,\n{}",
+    "Hola {},\n\nGracias por enviarnos tu propuesta. Es muy valioso contar con ideas como la tuya para enriquecer el programa. Vamos a revisarla y te escribimos si logramos incluirla.\n\nUn fuerte abrazo,\n{}",
+    "Hola {},\n\n¡Qué bueno recibir tu propuesta! La tendremos muy en cuenta en la construcción del programa. Si llega a hacer parte de la versión final, te lo haremos saber.\n\nGracias por creer en este proyecto,\n{}",
+    "Hola {},\n\nNos llegó tu propuesta y queremos darte las gracias. Queremos un programa que recoja muchas voces, y la tuya ya hace parte de ese esfuerzo. Si podemos incluirla, te contamos.\n\nCon gratitud,\n{}"
+]
+
+REMITENTES = [
+    "David Zarruk",
+    "Daniel Wills",
+    "Alejandro Vallejo",
+    "Guillermo Llinás",
+    "Juan José Echavarría",
+    "Juan Martín Londoño",
+    "Alejandra Londoño"
+]

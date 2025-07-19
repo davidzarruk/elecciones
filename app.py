@@ -1,19 +1,18 @@
 import requests
 import json
 from utils import get_links, get_articles, update_db, \
-    get_sentiment, read_df_from_s3, get_propuesta, \
+    get_sentiment, read_df_from_s3, get_propuesta, clean_and_format_name, \
     query_athena_to_df, filter_new_by_candidate_names, send_gmail, batch_scheduler_propuestas
 from params import NUM_NEWS, QUERY_PARAMS, ATHENA_TABLE, ATHENA_DB, ATHENA_OUTPUT, QUEUE_URL, \
-    SUBJECT_EMAIL, CONTENT_EMAIL
+    SUBJECT_EMAIL, RESPUESTAS_CORREO, REMITENTES
 import pandas as pd
 from bs4 import BeautifulSoup
 from datetime import datetime
-import re
+import random
 import json
 import boto3
 import uuid
-import io
-import os
+
 
 def scrape_news(event, context):
 
@@ -158,10 +157,14 @@ def queue_proposal(event, context):
 
     batch_scheduler_propuestas(QUEUE_URL, purge_queue=False)
 
+    remitente = random.choice(REMITENTES)
+    subject = random.choice(SUBJECT_EMAIL).format(clean_and_format_name(event['nombre']))
+    
     send_gmail(event['correo'],
-               SUBJECT_EMAIL,
-               SUBJECT_EMAIL)
-
+               subject,
+               random.choice(RESPUESTAS_CORREO).format(clean_and_format_name(event['nombre']),
+                                                       remitente))
+    
 
 
 if __name__ == "__main__":

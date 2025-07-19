@@ -581,6 +581,30 @@ def get_access_token():
     return access_token
 
 
+def send_email_ses(to_email, subject, body_text, from_email="davidzarruk@gmail.com"):
+    ses = boto3.client('ses', region_name='us-east-1')  # o la región donde activaste SES
+
+    response = ses.send_email(
+        Source=from_email,
+        Destination={
+            'ToAddresses': [to_email],
+        },
+        Message={
+            'Subject': {
+                'Data': subject,
+                'Charset': 'UTF-8'
+            },
+            'Body': {
+                'Text': {
+                    'Data': body_text,
+                    'Charset': 'UTF-8'
+                }
+            }
+        }
+    )
+    print("Correo enviado con SES:", response)
+
+
 def send_gmail(to_email, subject, body_text):
     access_token = get_access_token()
 
@@ -633,3 +657,14 @@ def batch_scheduler_propuestas(queue_url, purge_queue):
         print(f"Stored {len(df)} proposals to {s3_key}")
     else:
         print(f"No new proposals to store")
+
+
+def clean_and_format_name(name):
+    if not isinstance(name, str):
+        return name  # Return the value as is if it's not a string (e.g., NaN)
+    
+    # Remove country code in parentheses
+    name_cleaned = re.sub(r'\s*\(\w{3}\)$', '', name)
+    # Convert to title case
+    name_formatted = name_cleaned.title()
+    return name_formatted
