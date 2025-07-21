@@ -89,16 +89,25 @@ SUBJECT_EMAIL = [
 ]
 
 RESPUESTAS_CORREO = [
-    "Hola {},\n\nGracias por compartir tu propuesta. La vamos a revisar con mucho cuidado y, si podemos integrarla al programa de gobierno, nos comunicaremos contigo.\n\n¡Gracias por ser parte de este proceso!\n\nUn saludo,\n{}",
-    "Hola {},\n\nRecibimos tu propuesta y te agradecemos por tomarte el tiempo de enviarla. La vamos a considerar y te avisaremos si podemos incluirla en el plan de gobierno.\n\n¡Gracias por sumarte!\n\nSaludos,\n{}",
-    "Hola {},\n\nMil gracias por tu propuesta. Nos alegra saber que quieres aportar ideas. La revisaremos con atención y, si encaja en el programa, te lo haremos saber.\n\nUn abrazo,\n{}",
-    "Hola {},\n\nTe agradecemos mucho por enviarnos tu propuesta. Será parte del análisis que estamos haciendo para construir un proyecto colectivo. Si logramos incluirla, te lo contaremos.\n\nGracias por tu voz,\n{}",
-    "Hola {},\n\nRecibimos tu propuesta y te damos las gracias por sumarte con tus ideas. Vamos a revisarla y, si es posible incorporarla, nos pondremos en contacto.\n\nSeguimos construyendo juntos,\n{}",
-    "Hola {},\n\nGracias por tu mensaje y por aportar al proyecto. Cada propuesta cuenta, y la tuya será tenida en cuenta en este proceso de revisión. Si podemos incluirla, te avisamos.\n\nUn saludo grande,\n{}",
-    "Hola {},\n\nApreciamos mucho tu participación. Tu propuesta ya está en nuestras manos y será analizada con el mismo cuidado que todas. Si logramos incorporarla, te escribiremos.\n\nGracias por construir con nosotros,\n{}",
-    "Hola {},\n\nGracias por enviarnos tu propuesta. Es muy valioso contar con ideas como la tuya para enriquecer el programa. Vamos a revisarla y te escribimos si logramos incluirla.\n\nUn fuerte abrazo,\n{}",
-    "Hola {},\n\n¡Qué bueno recibir tu propuesta! La tendremos muy en cuenta en la construcción del programa. Si llega a hacer parte de la versión final, te lo haremos saber.\n\nGracias por creer en este proyecto,\n{}",
-    "Hola {},\n\nNos llegó tu propuesta y queremos darte las gracias. Queremos un programa que recoja muchas voces, y la tuya ya hace parte de ese esfuerzo. Si podemos incluirla, te contamos.\n\nCon gratitud,\n{}"
+    "Hola {},\n\nGracias por compartir tu propuesta. La vamos a revisar con mucho cuidado y, si podemos integrarla al programa de gobierno, nos comunicaremos contigo.\n\nA grandes rasgos, creería que podría servir para el documento de {}.\n\nUn saludo,\n{}",
+    
+    "Hola {},\n\nRecibimos tu propuesta y te agradecemos por tomarte el tiempo de enviarla. La vamos a considerar y te avisaremos si podemos incluirla en el plan de gobierno.\n\nInicialmente, me parece que podría tener relación con el documento de {}.\n\nSaludos,\n{}",
+    
+    "Hola {},\n\nMil gracias por tu propuesta. Nos alegra saber que quieres aportar ideas. La revisaremos con atención y, si encaja en el programa, te lo haremos saber.\n\nA simple vista, creería que podría tener un lugar en el documento de {}.\n\nUn abrazo,\n{}",
+    
+    "Hola {},\n\nTe agradecemos mucho por enviarnos tu propuesta. Será parte del análisis que estamos haciendo para construir un proyecto colectivo. Si logramos incluirla, te lo contaremos.\n\nEn principio, podría tener sentido incluirla en el documento de {}.\n\nGracias por tu voz,\n{}",
+    
+    "Hola {},\n\nRecibimos tu propuesta y te damos las gracias por sumarte con tus ideas. Vamos a revisarla y, si es posible incorporarla, nos pondremos en contacto.\n\nPensamos que, en términos generales, podría servir como insumo para el documento de {}.\n\nSeguimos construyendo juntos,\n{}",
+    
+    "Hola {},\n\nGracias por tu mensaje y por aportar al proyecto. Cada propuesta cuenta, y la tuya será tenida en cuenta en este proceso de revisión. Si podemos incluirla, te avisamos.\n\nEn un primer vistazo, podría ser útil como referencia para el documento de {}.\n\nUn saludo grande,\n{}",
+    
+    "Hola {},\n\nApreciamos mucho tu participación. Tu propuesta ya está en nuestras manos y será analizada con el mismo cuidado que todas. Si logramos incorporarla, te escribiremos.\n\nA grandes rasgos, creemos que podría aportar al documento de {}.\n\nGracias por construir con nosotros,\n{}",
+    
+    "Hola {},\n\nGracias por enviarnos tu propuesta. Es muy valioso contar con ideas como la tuya para enriquecer el programa. Vamos a revisarla y te escribimos si logramos incluirla.\n\nPor lo que hemos visto, podría aportar algo interesante al documento de {}.\n\nUn fuerte abrazo,\n{}",
+    
+    "Hola {},\n\n¡Qué bueno recibir tu propuesta! La tendremos muy en cuenta en la construcción del programa. Si llega a hacer parte de la versión final, te lo haremos saber.\n\nDe entrada, nos parece que podría servir como insumo en el documento de {}.\n\nGracias por creer en este proyecto,\n{}",
+    
+    "Hola {},\n\nNos llegó tu propuesta y queremos darte las gracias. Queremos un programa que recoja muchas voces, y la tuya ya hace parte de ese esfuerzo. Si podemos incluirla, te contamos.\n\nSin comprometer nada aún, creemos que podría ser considerada en el documento de {}.\n\nCon gratitud,\n{}"
 ]
 
 REMITENTES = [

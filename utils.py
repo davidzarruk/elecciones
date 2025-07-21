@@ -19,6 +19,13 @@ import requests
 from email.mime.text import MIMEText
 from email.header import Header
 from email.utils import formataddr
+import textract
+from tika import parser
+import tempfile
+import numpy as np
+from sklearn.metrics.pairwise import cosine_similarity
+import ast
+from params import ATHENA_DB, ATHENA_OUTPUT
 
 
 client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
@@ -128,12 +135,10 @@ def get_sentiment(candidatos, text, prompt):
 
 def update_db(df, folder,
               athena_table, athena_db, athena_output, 
-              date_str, run_str, source_str=""):
-    
-    if source_str != "":
-        s3_key = f"{folder}/source={source_str}/date={date_str}/run={run_str}/data.csv"
-    else:
-        s3_key = f"{folder}/date={date_str}/run={run_str}/data.csv"
+              partition_str=""):
+
+    # 🔹 Construct S3 key and upload file
+    s3_key = f"{folder}/data.csv"
 
     upload_df_to_s3(
         df,
@@ -143,18 +148,19 @@ def update_db(df, folder,
 
     print(f"File uploaded to: {s3_key}")
 
-    # 🔹 Ejecutar query para agregar partición a Athena
-    if source_str != "":
+    s3_uri = f"s3://zarruk/{folder}/"
+
+    # 🔹 Construct Athena query based on whether partition info is provided
+    if partition_str:
         partition_query = f"""
         ALTER TABLE {athena_table} ADD IF NOT EXISTS
-        PARTITION (source='{source_str}', date='{date_str}', run='{run_str}')
-        LOCATION 's3://zarruk/{folder}/source={source_str}/date={date_str}/run={run_str}/'
+        PARTITION ({partition_str})
+        LOCATION '{s3_uri}'
         """
     else:
         partition_query = f"""
-        ALTER TABLE {athena_table} ADD IF NOT EXISTS
-        PARTITION (date='{date_str}', run='{run_str}')
-        LOCATION 's3://zarruk/{folder}/date={date_str}/run={run_str}/'
+        ALTER TABLE {athena_table}
+        SET LOCATION '{s3_uri}'
         """
 
     query_id = run_athena_query(
@@ -163,7 +169,7 @@ def update_db(df, folder,
         output_location=athena_output
     )
 
-    print(f"Athena partition query submitted. QueryExecutionId: {query_id}")
+    print(f"Athena update query submitted. QueryExecutionId: {query_id}")
 
 
 
@@ -206,27 +212,61 @@ def read_df_from_s3(bucket_name, key):
     return df
 
 
-def read_all_csvs_from_s3_folder(bucket_name, folder_prefix):
-    s3 = boto3.client('s3')
+def read_all_files_from_s3_folder(bucket_name, folder_prefix, file_extension=None):
+    """
+    Reads files from an S3 folder.
     
-    # Step 1: List all CSV objects in the folder
+    Args:
+        bucket_name (str): S3 bucket name.
+        folder_prefix (str): Folder path in the bucket.
+        file_extension (str or None): Extension to filter by (e.g., '.csv', '.pdf'). If None, all files are included.
+
+    Returns:
+        If CSVs: pd.DataFrame
+        If PDFs: list of dicts {'key': ..., 'text': ...}
+        If None: list of dicts {'key': ..., 'content': ...}
+    """
+    s3 = boto3.client('s3')
     response = s3.list_objects_v2(Bucket=bucket_name, Prefix=folder_prefix)
-    csv_keys = [
+    
+    keys = [
         obj['Key'] for obj in response.get('Contents', [])
-        if obj['Key'].endswith('.csv')
+        if not obj['Key'].endswith('/') and (file_extension is None or obj['Key'].endswith(file_extension))
     ]
+    
+    results = []
 
-    all_dfs = []
-
-    # Step 2: Loop through and read each CSV
-    for key in csv_keys:
+    for key in keys:
         obj = s3.get_object(Bucket=bucket_name, Key=key)
-        df = pd.read_csv(obj['Body'], encoding='utf-8')
-        all_dfs.append(df)
+        
+        if key.endswith('.csv'):
+            df = pd.read_csv(obj['Body'], encoding='utf-8')
+            results.append(df)
 
-    # Step 3: Concatenate all into a single DataFrame
-    combined_df = pd.concat(all_dfs, ignore_index=True)
-    return combined_df
+        elif key.endswith('.pdf'):
+            with tempfile.NamedTemporaryFile(delete=False, suffix='.pdf') as tmp_file:
+                tmp_file.write(obj['Body'].read())
+                tmp_file_path = tmp_file.name
+
+            try:
+                text = textract.process(tmp_file_path, encoding='unicode_escape').decode('utf-8')
+                results.append({'key': key.replace(folder_prefix, "").replace("Documento - ", "").replace(".pdf", ""), 'content': text})
+            finally:
+                os.remove(tmp_file_path)
+
+        else:
+            # Generic content fallback
+            content = obj['Body'].read()
+            results.append({'key': key, 'content': content})
+
+    # Handle returns based on content
+    if file_extension == '.csv':
+        if not results:
+            raise ValueError("No CSV files found.")
+        return pd.concat(results, ignore_index=True)
+    
+    return results
+
 
 
 def get_links(response, source, params):
@@ -644,17 +684,33 @@ def batch_scheduler_propuestas(queue_url, purge_queue):
     if len(df)>0:
         # Create CSV in memory
         csv_buffer = io.StringIO()
-        df.to_csv(csv_buffer, index=False)
+        df.to_csv(csv_buffer, index=False, header=False)
 
         # Save to S3 (organized by date/hour)
         now = datetime.utcnow()
         dt = now.strftime('%Y-%m-%d')
         hr = now.strftime('%H')
-        s3_key = f"proposals/date={dt}/hour={hr}/proposals.csv"
+        s3_key = f"proposals/date={dt}/hour={hr}"
 
-        s3.put_object(Bucket="zarruk", Key=s3_key, Body=csv_buffer.getvalue())
+        s3.put_object(Bucket="zarruk",
+                      Key=f"{s3_key}/proposals.csv",
+                      Body=csv_buffer.getvalue())
 
         print(f"Stored {len(df)} proposals to {s3_key}")
+
+        # 🔹 Construct Athena query based on whether partition info is provided
+        partition_query = f"""
+        ALTER TABLE propuestas_table ADD IF NOT EXISTS
+        PARTITION (date='{dt}', hour='{hr}')
+        LOCATION 's3://zarruk/{s3_key}/'
+        """
+
+        run_athena_query(
+            query=partition_query,
+            database=ATHENA_DB,
+            output_location=ATHENA_OUTPUT
+        )
+
     else:
         print(f"No new proposals to store")
 
@@ -668,3 +724,49 @@ def clean_and_format_name(name):
     # Convert to title case
     name_formatted = name_cleaned.title()
     return name_formatted
+
+
+def get_embedding(prompt_data):
+
+    bedrock_runtime = boto3.client('bedrock-runtime', region_name='us-east-1')  # Change region if needed
+
+    body = json.dumps({"inputText": prompt_data})
+    modelId = "amazon.titan-embed-text-v1"  # (Change this to try different embedding models)
+    accept = "application/json"
+    contentType = "application/json"
+
+    response = bedrock_runtime.invoke_model(
+        body=body, modelId=modelId, accept=accept, contentType=contentType
+    )
+    response_body = json.loads(response.get("body").read())
+
+    embedding = response_body.get("embedding")
+    return embedding
+
+
+def generate_text_dataframe(text, title):
+    embeddings = []
+
+    embeddings.append(get_embedding(text[:16000]))
+
+    df_text = pd.DataFrame({'title': title, 'embedding': embeddings})
+    return df_text
+
+
+def compute_closest_texts(target_embedding, embeddings, embedding_column='embedding'):
+    # Asegúrate de que target_embedding sea un array numpy bidimensional
+    vector_array = np.array(target_embedding).reshape(1, -1)
+
+    # Convertir cada valor en la columna a una lista de floats (en caso de que sea string)
+    matrix_array = np.array([
+        ast.literal_eval(emb) if isinstance(emb, str) else emb
+        for emb in embeddings[embedding_column]
+    ])
+
+    # Calcular la similitud coseno
+    similarities = cosine_similarity(vector_array, matrix_array).flatten()
+
+    # Obtener los índices ordenados de mayor a menor similitud (excluyendo el mismo texto si aplica)
+    top_indices = np.argsort(similarities)[::-1]
+
+    return top_indices
