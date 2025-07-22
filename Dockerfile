@@ -11,8 +11,9 @@ COPY lista_candidatos.txt ${LAMBDA_TASK_ROOT}
 
 # Install the function's dependencies using file requirements.txt
 COPY requirements.txt .
-RUN python -m pip install "pip<24.1" && \
-    python -m pip install --no-cache-dir -r requirements.txt --target ${LAMBDA_TASK_ROOT}
+RUN python3 -m pip install --upgrade "pip<24.1"
+RUN python3 -m pip install --no-cache-dir -r requirements.txt --target ${LAMBDA_TASK_ROOT}
+RUN python3 -m pip --version
 
 # Set the CMD to your handler
 CMD ["app.handler"]
