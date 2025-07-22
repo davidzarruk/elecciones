@@ -19,7 +19,7 @@ import requests
 from email.mime.text import MIMEText
 from email.header import Header
 from email.utils import formataddr
-import textract
+from pdfminer.high_level import extract_text as extract_pdf_text
 from tika import parser
 import tempfile
 import numpy as np
@@ -223,22 +223,22 @@ def read_all_files_from_s3_folder(bucket_name, folder_prefix, file_extension=Non
 
     Returns:
         If CSVs: pd.DataFrame
-        If PDFs: list of dicts {'key': ..., 'text': ...}
+        If PDFs: list of dicts {'key': ..., 'content': ...}
         If None: list of dicts {'key': ..., 'content': ...}
     """
     s3 = boto3.client('s3')
     response = s3.list_objects_v2(Bucket=bucket_name, Prefix=folder_prefix)
-    
+
     keys = [
         obj['Key'] for obj in response.get('Contents', [])
         if not obj['Key'].endswith('/') and (file_extension is None or obj['Key'].endswith(file_extension))
     ]
-    
+
     results = []
 
     for key in keys:
         obj = s3.get_object(Bucket=bucket_name, Key=key)
-        
+
         if key.endswith('.csv'):
             df = pd.read_csv(obj['Body'], encoding='utf-8')
             results.append(df)
@@ -249,22 +249,23 @@ def read_all_files_from_s3_folder(bucket_name, folder_prefix, file_extension=Non
                 tmp_file_path = tmp_file.name
 
             try:
-                text = textract.process(tmp_file_path, encoding='unicode_escape').decode('utf-8')
-                results.append({'key': key.replace(folder_prefix, "").replace("Documento - ", "").replace(".pdf", ""), 'content': text})
+                text = extract_pdf_text(tmp_file_path)
+                results.append({
+                    'key': key.replace(folder_prefix, "").replace("Documento - ", "").replace(".pdf", ""),
+                    'content': text
+                })
             finally:
                 os.remove(tmp_file_path)
 
         else:
-            # Generic content fallback
-            content = obj['Body'].read()
+            content = obj['Body'].read().decode('utf-8', errors='ignore')
             results.append({'key': key, 'content': content})
 
-    # Handle returns based on content
     if file_extension == '.csv':
         if not results:
             raise ValueError("No CSV files found.")
         return pd.concat(results, ignore_index=True)
-    
+
     return results
 
 
