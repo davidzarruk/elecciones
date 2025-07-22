@@ -149,12 +149,15 @@ def queue_proposal(event, context):
     query = f"SELECT DISTINCT titulo, embedding FROM documentos_programaticos"
     df_embeddings = query_athena_to_df(query, "news_db", "s3://zarruk/athena-results/")
 
+    print(f"Getting embedding for proposal...")
     target_embedding = get_embedding(event['propuesta'])
 
+    print(f"Computing closest proposal...")
     top_indices = compute_closest_texts(target_embedding,
                                         df_embeddings,
                                         embedding_column = 'embedding')
 
+    print(f"Storing message...")
     message = {
         "proposal_id": str(uuid.uuid4()),
         "nombre": event['nombre'],
@@ -169,6 +172,7 @@ def queue_proposal(event, context):
         "submitted_at": datetime.utcnow().isoformat()
     }
     
+    print(f"Queueing message...")
     sqs.send_message(
         QueueUrl=QUEUE_URL,
         MessageBody=json.dumps(message)
@@ -181,6 +185,7 @@ def queue_proposal(event, context):
     remitente = random.choice(REMITENTES)
     subject = random.choice(SUBJECT_EMAIL).format(clean_and_format_name(event['nombre']))
 
+    print(f"Sending email...")
     send_gmail(event['correo'],
                subject,
                random.choice(RESPUESTAS_CORREO).format(clean_and_format_name(event['nombre']),
