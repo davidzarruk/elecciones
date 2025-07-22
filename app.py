@@ -145,31 +145,24 @@ def get_candidate_propuestas(event, context):
 def queue_proposal(event, context):
     sqs = boto3.client('sqs')
 
-    print(f"Getting embeddings from existing proposals...")
-    query = f"SELECT DISTINCT titulo, embedding FROM documentos_programaticos"
-    df_embeddings = query_athena_to_df(query, "news_db", "s3://zarruk/athena-results/")
+#    print(f"Getting embeddings from existing proposals...")
+#    query = f"SELECT DISTINCT titulo, embedding FROM documentos_programaticos"
+#    df_embeddings = query_athena_to_df(query, "news_db", "s3://zarruk/athena-results/")
 
-    print(f"Getting embedding for proposal...")
-    target_embedding = get_embedding(event['propuesta'])
+#    print(f"Getting embedding for proposal...")
+#    target_embedding = get_embedding(event['propuesta'])
 
-    print(f"Computing closest proposal...")
-    top_indices = compute_closest_texts(target_embedding,
-                                        df_embeddings,
-                                        embedding_column = 'embedding')
+#    print(f"Computing closest proposal...")
+#    top_indices = compute_closest_texts(target_embedding,
+#                                        df_embeddings,
+#                                        embedding_column = 'embedding')
 
     print(f"Storing message...")
     message = {
         "proposal_id": str(uuid.uuid4()),
         "nombre": event['nombre'],
         "correo": event['correo'],
-        "propuesta": event['propuesta'],
-        "embedding": target_embedding,
-        "closest_document_1": df_embeddings['titulo'][top_indices[0]],
-        "closest_document_2": df_embeddings['titulo'][top_indices[1]],
-        "closest_document_3": df_embeddings['titulo'][top_indices[2]],
-        "closest_document_4": df_embeddings['titulo'][top_indices[3]],
-        "closest_document_5": df_embeddings['titulo'][top_indices[4]],
-        "submitted_at": datetime.utcnow().isoformat()
+        "propuesta": event['propuesta']
     }
     
     print(f"Queueing message...")
@@ -189,7 +182,7 @@ def queue_proposal(event, context):
     send_gmail(event['correo'],
                subject,
                random.choice(RESPUESTAS_CORREO).format(clean_and_format_name(event['nombre']),
-                                                       df_embeddings['titulo'][top_indices[0]].lower(),
+                                                       "",
                                                        remitente))
     
 
