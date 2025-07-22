@@ -70,7 +70,6 @@ sortedcontainers==2.4.0
 soupsieve==2.7
 SpeechRecognition==3.8.1
 threadpoolctl==3.6.0
-tika==3.1.0
 tqdm==4.67.1
 typing-inspection==0.4.1
 typing_extensions==4.14.0

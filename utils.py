@@ -20,7 +20,6 @@ from email.mime.text import MIMEText
 from email.header import Header
 from email.utils import formataddr
 from pdfminer.high_level import extract_text as extract_pdf_text
-from tika import parser
 import tempfile
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
