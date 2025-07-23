@@ -1,33 +1,11 @@
-import pandas as pd
+import os
 import json
-import boto3
-from io import BytesIO
 import re
-from openai import OpenAI
-import os
-import time
-from bs4 import BeautifulSoup
-import requests
-import base64
-import json
-import requests
-from datetime import datetime
-import io
-import os
-import base64
-import requests
-from email.mime.text import MIMEText
-from email.header import Header
-from email.utils import formataddr
-from pdfminer.high_level import extract_text as extract_pdf_text
-import tempfile
-import numpy as np
-from sklearn.metrics.pairwise import cosine_similarity
-import ast
+import boto3
+import pandas as pd
 from params import ATHENA_DB, ATHENA_OUTPUT
+import io
 
-
-client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
 def run_athena_query(query, database, output_location):
     client = boto3.client('athena', region_name='us-east-2')
@@ -48,6 +26,8 @@ def filter_new_by_candidate_names(df, candidates):
 
 
 def query_athena_to_df(query, database, output_location):
+    import time
+
     # Iniciar la ejecución del query
     athena_client = boto3.client('athena', region_name='us-east-2')
     response = athena_client.start_query_execution(
@@ -77,6 +57,10 @@ def query_athena_to_df(query, database, output_location):
 
 
 def answer_question(question, prompt_data, tokens=1000):
+    from openai import OpenAI
+
+    client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+
     modelId = "gpt-4o"
 
     input = {
@@ -191,6 +175,8 @@ def get_propuesta(candidatos, text, prompt, json_propuestas, fuente):
 
 
 def upload_df_to_s3(df, bucket_name, key):
+    from io import BytesIO
+
     s3 = boto3.client('s3')
     buffer = BytesIO()
 
@@ -225,6 +211,9 @@ def read_all_files_from_s3_folder(bucket_name, folder_prefix, file_extension=Non
         If PDFs: list of dicts {'key': ..., 'content': ...}
         If None: list of dicts {'key': ..., 'content': ...}
     """
+    from pdfminer.high_level import extract_text as extract_pdf_text
+    import tempfile
+
     s3 = boto3.client('s3')
     response = s3.list_objects_v2(Bucket=bucket_name, Prefix=folder_prefix)
 
@@ -283,6 +272,8 @@ def get_links(response, source, params):
 
 
 def get_links_LSV(response):
+    from bs4 import BeautifulSoup
+
     # Parse the HTML
     soup = BeautifulSoup(response, 'html.parser')
 
@@ -296,6 +287,8 @@ def get_links_LSV(response):
     return list(set(article_links))
 
 def get_links_wradio(response, params):
+    from bs4 import BeautifulSoup
+
     soup = BeautifulSoup(response, "html.parser")
     all_links = soup.find_all('a')
     links = [f'{params["base_url"]}{a.get("href")}' for a in all_links if a.get("href", "").startswith("/2025/")]
@@ -362,6 +355,8 @@ def get_articles(link, session, source):
 
 
 def get_articles_LSV(link, session):
+    from bs4 import BeautifulSoup
+
     print(f"Started request for article: {link}")
     link_response = session.get(link)
     soup = BeautifulSoup(link_response.content, "html.parser")
@@ -391,6 +386,8 @@ def get_articles_LSV(link, session):
 
 
 def get_articles_wradio(link, session):
+    from bs4 import BeautifulSoup
+
     print(f"Started request for article: {link}")
     link_response = session.get(link)
     soup = BeautifulSoup(link_response.content, "html.parser")
@@ -441,6 +438,8 @@ def get_articles_wradio(link, session):
 
 
 def get_articles_semana(link, session):
+    from bs4 import BeautifulSoup
+
     print(f"Started request for article: {link}")
     link_response = session.get(link)
     soup = BeautifulSoup(link_response.content, "html.parser")
@@ -500,6 +499,8 @@ def get_articles_semana(link, session):
 
 
 def get_articles_elespectador(link, session):
+    from bs4 import BeautifulSoup
+
     print(f"Started request for article: {link}")
     link_response = session.get(link)
     soup = BeautifulSoup(link_response.content, "html.parser")
@@ -604,6 +605,8 @@ def get_df_from_queue(queue_url, purge_queue=True):
     return df
 
 def get_access_token():
+    import requests
+
     """
     Use the refresh token to get a new access token from Google OAuth.
     """
@@ -646,6 +649,12 @@ def send_email_ses(to_email, subject, body_text, from_email="davidzarruk@gmail.c
 
 
 def send_gmail(to_email, subject, body_text):
+    import requests
+    import base64
+    from email.mime.text import MIMEText
+    from email.header import Header
+    from email.utils import formataddr
+
     access_token = get_access_token()
 
     # Properly encode subject with UTF-8 using email.mime
@@ -677,6 +686,8 @@ def send_gmail(to_email, subject, body_text):
 
 
 def batch_scheduler_propuestas(queue_url, purge_queue):
+    from datetime import datetime
+
     s3 = boto3.client('s3')
 
     df = get_df_from_queue(queue_url, purge_queue=False)
@@ -756,6 +767,10 @@ def generate_text_dataframe(text, title):
 
 
 def compute_closest_texts(target_embedding, embeddings, embedding_column='embedding'):
+    import numpy as np
+    from sklearn.metrics.pairwise import cosine_similarity
+    import ast
+
     # Asegúrate de que target_embedding sea un array numpy bidimensional
     vector_array = np.array(target_embedding).reshape(1, -1)
 
