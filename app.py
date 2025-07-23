@@ -153,9 +153,12 @@ def queue_proposal(event, context):
     target_embedding = get_embedding(event['propuesta'])
 
     print(f"Computing closest proposal...")
-    top_indices = compute_closest_texts(target_embedding,
-                                        df_embeddings,
-                                        embedding_column = 'embedding')
+    top_indices, top_similarities = compute_closest_texts(target_embedding,
+                                                          df_embeddings,
+                                                          embedding_column = 'embedding')
+    
+    print(f"Top 5 similarities: {top_similarities[0:5]}")
+    print(f"Top 5 themes: {df_embeddings['titulo'][top_indices[0:5]]}")
 
     print(f"Storing message...")
     message = {
@@ -182,13 +185,14 @@ def queue_proposal(event, context):
 
     batch_scheduler_propuestas(QUEUE_URL, purge_queue=False)
 
+    first_name = event['nombre'].split(" ")[0]
     remitente = random.choice(REMITENTES)
-    subject = random.choice(SUBJECT_EMAIL).format(clean_and_format_name(event['nombre']))
+    subject = random.choice(SUBJECT_EMAIL).format(clean_and_format_name(first_name))
 
     print(f"Sending email...")
     send_gmail(event['correo'],
                subject,
-               random.choice(RESPUESTAS_CORREO).format(clean_and_format_name(event['nombre']),
+               random.choice(RESPUESTAS_CORREO).format(clean_and_format_name(first_name),
                                                        df_embeddings['titulo'][top_indices[0]].lower(),
                                                        remitente))
     
@@ -221,7 +225,7 @@ def construct_document_embeddings(event, context):
 if __name__ == "__main__":
 
     queue_proposal({'propuesta': 'Quisiera proponer más árboles.',
-                    'nombre': 'david',
+                    'nombre': 'david zarruk',
                     'correo': 'davidzarruk@gmail.com'}, {})
 
 #    batch_scheduler_propuestas({}, {})
