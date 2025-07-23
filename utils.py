@@ -711,6 +711,7 @@ def batch_scheduler_propuestas(queue_url, purge_queue):
             database=ATHENA_DB,
             output_location=ATHENA_OUTPUT
         )
+        print(f"Athena query updated successfully")
 
     else:
         print(f"No new proposals to store")
