@@ -740,18 +740,20 @@ def clean_and_format_name(name):
 
 
 def get_embedding(prompt_data):
-    import openai
 
-    # Ensure your API key is set in the environment
-    client = openai.OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+    bedrock_runtime = boto3.client('bedrock-runtime', region_name='us-east-1')  # Change region if needed
 
-    response = client.embeddings.create(
-        model="text-embedding-3-small",
-        input=prompt_data,
-        dimensions=512  # Reduce embedding size
+    body = json.dumps({"inputText": prompt_data})
+    modelId = "amazon.titan-embed-text-v1"  # (Change this to try different embedding models)
+    accept = "application/json"
+    contentType = "application/json"
+
+    response = bedrock_runtime.invoke_model(
+        body=body, modelId=modelId, accept=accept, contentType=contentType
     )
+    response_body = json.loads(response.get("body").read())
 
-    embedding = [round(val, 4) for val in response.data[0].embedding]
+    embedding = [round(resp, 4) for resp in response_body.get("embedding")]
     return embedding
 
 
