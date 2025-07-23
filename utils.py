@@ -705,6 +705,7 @@ def batch_scheduler_propuestas(queue_url, purge_queue):
         LOCATION 's3://zarruk/{s3_key}/'
         """
 
+        print(f"Updating Athena query")
         run_athena_query(
             query=partition_query,
             database=ATHENA_DB,
