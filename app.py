@@ -245,7 +245,7 @@ def get_proposals_value(event, context):
 
         # Crear un diccionario plano para el DataFrame
         df_dict = {
-            'proposal_id': eval_dict['propuesta_original'][:10],  # primeros 10 caracteres como ID
+            'proposal_id': eval_dict['propuesta_original'][:100],  # primeros 10 caracteres como ID
             'nombre': eval_dict['datos_proponente']['nombre'],
             'email': eval_dict['datos_proponente']['email'],
             'propuesta': eval_dict['propuesta_original'],
@@ -277,14 +277,14 @@ def get_proposals_value(event, context):
 
         df_all = pd.concat([df_all, df_output])
 
-    now = datetime.utcnow()
-    dt = now.strftime('%Y-%m-%d')
-    hr = now.strftime('%H')
-    s3_key = f"proposals_analyzed/date={dt}/hour={hr}"
+        now = datetime.utcnow()
+        dt = now.strftime('%Y-%m-%d')
+        hr = now.strftime('%H')
+        s3_key = f"proposals_analyzed/date={dt}/hour={hr}"
 
-    partition = f"date='{dt}', hour='{hr}'"
+        partition = f"date='{dt}', hour='{hr}'"
 
-    store_df_as_parquet(df_all, s3_key, "propuestas", partition, "propuestas_analyzed")
+        store_df_as_parquet(df_all, s3_key, "propuestas", partition, "propuestas_analyzed")
 
 
 
