@@ -228,8 +228,8 @@ def get_proposals_value(event, context):
                                  f"documentos-programaticos/Documento - {df['closest_document_2'][i]}.pdf", clean_filename=True)
 
         print(text1)
-        prompt = cargar_prompt(text1, 
-                               text2, 
+        prompt = cargar_prompt(text1['content'], 
+                               text2['content'], 
                                df['propuesta'][i], 
                                df['nombre'][i], 
                                df['correo'][i])
