@@ -212,6 +212,7 @@ def get_proposals_value(event, context):
     df = query_athena_to_df(query, database, output_location)
 
     print("Iterating over documents...")
+    df_all = pd.DataFrame()
     for i in range(len(df)):
         prompt = cargar_prompt(df['closest_document_1'][i], 
                                df['closest_document_2'][i], 
@@ -223,8 +224,20 @@ def get_proposals_value(event, context):
         response = answer_question("", prompt)
         data_json = json.loads(extract_json(response))
 
-        print(data_json)
+        df_output = pd.DataFrame(data_json)
 
+        print(df_output.columns)
+
+        df_all = pd.concat([df_all, df_output])
+
+    now = datetime.utcnow()
+    dt = now.strftime('%Y-%m-%d')
+    hr = now.strftime('%H')
+    s3_key = f"proposals_analyzed/date={dt}/hour={hr}"
+
+    partition = f"date='{dt}', hour='{hr}'"
+
+    store_df_as_parquet(df_all, s3_key, "propuestas", partition, "propuestas_analyzed")
 
 
 
