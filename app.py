@@ -234,7 +234,7 @@ def get_proposals_value(event, context):
                                df['correo'][i])
         
         print("LLM analyzing proposal...")
-        response = answer_question("", prompt)
+        response = answer_question("", prompt, model_provider=event['model'])
 
         print(response)
 
@@ -269,7 +269,7 @@ def get_proposals_value(event, context):
 
         print(df_output.columns)
 
-        print("Sending email...")
+        print("Sending email to person...")
         send_gmail(eval_dict['datos_proponente']['email'],
                    eval_dict['comunicacion_proponente']['asunto'],
                    eval_dict['comunicacion_proponente']['cuerpo_correo'])
@@ -320,7 +320,7 @@ if __name__ == "__main__":
 #                    'nombre': 'david zarruk',
 #                    'correo': 'davidzarruk@gmail.com'}, {})
 
-    get_proposals_value({}, {})
+    get_proposals_value({'model': 'claude'}, {})
 
 #    batch_scheduler_propuestas({}, {})
 

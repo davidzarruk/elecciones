@@ -28,10 +28,12 @@ para el programa de gobierno existente, basándote ÚNICAMENTE en los documentos
    - Valor agregado respecto al contenido existente
    - Viabilidad según lo establecido en los documentos
 6. Para cada documento, identifica:
-   - El texto exacto que se debe incorporar
-   - La sección específica donde debe insertarse
-   - Los párrafos anterior y posterior al punto de inserción
-   - Cualquier instrucción especial para la edición
+   - EXTRAE LITERALMENTE el texto específico de la propuesta que debe incorporarse, en un formato listo para copiar y pegar
+   - No des instrucciones generales ni resúmenes, sino el texto exacto y final que se incorporará
+   - El texto debe estar redactado en el mismo estilo y tono del documento original
+   - La sección específica donde debe insertarse, citando el título exacto de la sección
+   - Cita textualmente las primeras 10-15 palabras del párrafo que precede al punto de inserción
+   - Cita textualmente las primeras 10-15 palabras del párrafo que sigue al punto de inserción
 7. Asegúrate de que las incorporaciones en ambos documentos sean coherentes entre sí
 </task_instructions>
 
@@ -61,18 +63,18 @@ Genera una respuesta en formato JSON que incluya:
             5 = Agrega valor excepcional",
         "incorporacion_propuesta": {
             "documento_1": {
-                "texto_a_incorporar": "texto específico que se debe agregar al primer documento",
-                "seccion_especifica": "sección del documento donde se debe incorporar",
-                "parrafo_anterior": "primeras palabras del párrafo que precede al punto de inserción",
-                "parrafo_posterior": "primeras palabras del párrafo que sigue al punto de inserción",
-                "notas_edicion": "instrucciones específicas para la incorporación del texto"
+                "texto_a_incorporar": "TEXTO LITERAL Y FINAL que se debe copiar y pegar en el documento, NO instrucciones ni resúmenes. Debe estar completamente redactado y listo para su incorporación directa",
+                "seccion_especifica": "título exacto de la sección donde se incorporará",
+                "parrafo_anterior": "cita textual de las primeras 10-15 palabras del párrafo que precede",
+                "parrafo_posterior": "cita textual de las primeras 10-15 palabras del párrafo que sigue",
+                "notas_edicion": "SOLO instrucciones técnicas de formato si son necesarias (ej: 'mantener el mismo tamaño de fuente', 'agregar viñeta al inicio')"
             },
             "documento_2": {
-                "texto_a_incorporar": "texto específico que se debe agregar al segundo documento",
-                "seccion_especifica": "sección del documento donde se debe incorporar",
-                "parrafo_anterior": "primeras palabras del párrafo que precede al punto de inserción",
-                "parrafo_posterior": "primeras palabras del párrafo que sigue al punto de inserción",
-                "notas_edicion": "instrucciones específicas para la incorporación del texto"
+                "texto_a_incorporar": "TEXTO LITERAL Y FINAL que se debe copiar y pegar en el documento, NO instrucciones ni resúmenes. Debe estar completamente redactado y listo para su incorporación directa",
+                "seccion_especifica": "título exacto de la sección donde se incorporará",
+                "parrafo_anterior": "cita textual de las primeras 10-15 palabras del párrafo que precede",
+                "parrafo_posterior": "cita textual de las primeras 10-15 palabras del párrafo que sigue",
+                "notas_edicion": "SOLO instrucciones técnicas de formato si son necesarias (ej: 'mantener el mismo tamaño de fuente', 'agregar viñeta al inicio')"
             }
         },
         "conflictos": "si existen, listar conflictos específicos con otras partes del programa",
@@ -108,6 +110,10 @@ IMPORTANTE:
 - Si no hay suficiente información para evaluar algún aspecto, indícalo claramente
 - Basa todas las justificaciones en citas o referencias específicas de los documentos programáticos
 - Si hay contradicciones entre los documentos, indícalo explícitamente
+- El texto a incorporar debe ser LITERAL y estar listo para copiar y pegar, no instrucciones ni resúmenes
+- El texto debe mantener el estilo, tono y formato del documento original
+- Usa comillas para indicar claramente el inicio y fin del texto a incorporar
+- No uses palabras como "incorporar", "agregar", "añadir" en el texto_a_incorporar; solo el contenido final
 </constraints>
 
 <communication_guidelines>
@@ -115,3 +121,11 @@ IMPORTANTE:
 - La comunicación debe ser clara y específica sobre qué elementos de la propuesta se incorporarán
 - Usa siempre el tratamiento y nombre proporcionados para personalizar la comunicación
 </communication_guidelines>
+
+<examples>
+EJEMPLO INCORRECTO de texto_a_incorporar:
+"Incorporar un programa de formación en IA para jóvenes"
+
+EJEMPLO CORRECTO de texto_a_incorporar:
+"El programa de educación digital incluirá módulos específicos de inteligencia artificial donde los estudiantes aprenderán a trabajar en conjunto con sistemas de IA, desarrollando habilidades de pensamiento crítico y criterio humano para supervisar y complementar las capacidades de la tecnología."
+</examples>

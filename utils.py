@@ -56,32 +56,104 @@ def query_athena_to_df(query, database, output_location):
     return df
 
 
-def answer_question(question, prompt_data, tokens=1000):
-    from openai import OpenAI
-
-    client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
-
-    modelId = "gpt-4o"
-
-    input = {
-        "modelId": modelId,
-        "contentType": "application/json",
-        "accept": "*/*"
+def answer_question(
+    question, 
+    prompt_data, 
+    model_provider="openai",
+    model_config={
+        "openai": {
+            "model": "gpt-4",
+            "temperature": 0.7,
+            "max_tokens": 1000
+        },
+        "claude": {
+            "model": "anthropic.claude-v2",
+            "temperature": 0.7,
+            "max_tokens": 1000
+        }
     }
+):
+    """
+    Get response from either OpenAI or Claude (Bedrock)
     
-    completion = client.chat.completions.create(
-        model=input['modelId'],
-        messages=[
-            {
-                "role": "user",
-                "content": prompt_data + " " + question
+    Args:
+        question (str): The question to ask
+        prompt_data (str): Additional context or prompt
+        model_provider (str): Either "openai" or "claude"
+        model_config (dict): Configuration for each model
+        
+    Returns:
+        dict: Contains response and metadata
+    """
+    try:
+        if model_provider.lower() == "openai":
+            from openai import OpenAI
+            
+            if "OPENAI_API_KEY" not in os.environ:
+                raise ValueError("OPENAI_API_KEY not found in environment variables")
+            
+            client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+            
+            completion = client.chat.completions.create(
+                model=model_config["openai"]["model"],
+                messages=[
+                    {
+                        "role": "user",
+                        "content": prompt_data + " " + question
+                    }
+                ],
+                temperature=model_config["openai"]["temperature"],
+                max_tokens=model_config["openai"]["max_tokens"]
+            )
+            
+            return {
+                "response": completion.choices[0].message.content,
+                "model": model_config["openai"]["model"],
+                "provider": "openai",
+                "status": "success"
             }
-        ]
-    )
-
-    response_body = completion.choices[0].message.content
-
-    return response_body
+            
+        elif model_provider.lower() == "claude":
+            import boto3
+            import json
+            
+            bedrock = boto3.client(
+                service_name='bedrock-runtime',
+                region_name='us-east-1'
+            )
+            
+            body = json.dumps({
+                "prompt": f"\n\nHuman: {prompt_data} {question}\n\nAssistant:",
+                "max_tokens_to_sample": model_config["claude"]["max_tokens"],
+                "temperature": model_config["claude"]["temperature"],
+                "anthropic_version": "bedrock-2023-05-31"
+            })
+            
+            response = bedrock.invoke_model(
+                modelId=model_config["claude"]["model"],
+                body=body
+            )
+            
+            response_body = json.loads(response.get('body').read())
+            
+            return {
+                "response": response_body.get('completion'),
+                "model": model_config["claude"]["model"],
+                "provider": "claude",
+                "status": "success"
+            }
+            
+        else:
+            raise ValueError("model_provider must be either 'openai' or 'claude'")
+            
+    except Exception as e:
+        return {
+            "response": None,
+            "model": model_config[model_provider]["model"],
+            "provider": model_provider,
+            "status": "error",
+            "error": str(e)
+        }
 
 
 def extract_json(text):
