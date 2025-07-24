@@ -269,6 +269,17 @@ def get_proposals_value(event, context):
 
         print(df_output.columns)
 
+        print("Sending email...")
+        first_name = event['nombre'].split(" ")[0]
+        remitente = random.choice(REMITENTES)
+        subject = random.choice(SUBJECT_EMAIL).format(clean_and_format_name(first_name))
+
+        print(f"Sending email...")
+        send_gmail(eval_dict['datos_proponente']['email'],
+                   eval_dict['comunicacion_proponente']['asunto'],
+                   eval_dict['comunicacion_proponente']['cuerpo_correo'])
+
+
         df_all = pd.concat([df_all, df_output])
 
     now = datetime.utcnow()
