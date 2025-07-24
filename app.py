@@ -222,6 +222,9 @@ def get_proposals_value(event, context):
         
         print("LLM analyzing proposal...")
         response = answer_question("", prompt)
+
+        print(response)
+
         data_json = json.loads(extract_json(response))
 
         df_output = pd.DataFrame(data_json)
