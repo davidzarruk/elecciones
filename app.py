@@ -3,7 +3,8 @@ import json
 from utils import get_links, get_articles, update_db, \
     get_sentiment, read_df_from_s3, get_propuesta, clean_and_format_name, \
     query_athena_to_df, filter_new_by_candidate_names, send_gmail, batch_scheduler_propuestas, \
-    generate_text_dataframe, read_all_files_from_s3_folder, compute_closest_texts, get_embedding
+    generate_text_dataframe, read_all_files_from_s3_folder, compute_closest_texts, get_embedding, \
+    cargar_prompt, answer_question, extract_json, store_df_as_parquet
 from params import NUM_NEWS, QUERY_PARAMS, ATHENA_TABLE, ATHENA_DB, ATHENA_OUTPUT, QUEUE_URL, \
     SUBJECT_EMAIL, RESPUESTAS_CORREO, REMITENTES
 import pandas as pd
@@ -13,7 +14,7 @@ import random
 import json
 import boto3
 import uuid
-
+import time
 
 
 def scrape_news(event, context):
@@ -197,6 +198,36 @@ def queue_proposal(event, context):
                                                        remitente))
     
 
+def get_proposals_value(event, context):
+    
+    print("Reading proposals")
+    query = """
+    SELECT nombre, correo, propuesta, closest_document_1, closest_document_2
+    FROM propuestas_table
+    """
+
+    database = "news_db"
+    output_location = "s3://zarruk/athena-results/"
+
+    df = query_athena_to_df(query, database, output_location)
+
+    print("Iterating over documents...")
+    for i in range(len(df)):
+        prompt = cargar_prompt(df['closest_document_1'][i], 
+                               df['closest_document_2'][i], 
+                               df['propuesta'][i], 
+                               df['nombre'][i], 
+                               df['correo'][i])
+        
+        print("LLM analyzing proposal...")
+        response = answer_question("", prompt)
+        data_json = json.loads(extract_json(response))
+
+        print(data_json)
+
+
+
+
 def construct_document_embeddings(event, context):
 
     folder = "documentos-programaticos/"
@@ -224,13 +255,16 @@ def construct_document_embeddings(event, context):
 
 if __name__ == "__main__":
 
-    queue_proposal({'propuesta': 'Quisiera proponer más árboles.',
-                    'nombre': 'david zarruk',
-                    'correo': 'davidzarruk@gmail.com'}, {})
+#    queue_proposal({'propuesta': """
+#                    """,
+#                    'nombre': 'david zarruk',
+#                    'correo': 'davidzarruk@gmail.com'}, {})
+
+    get_proposals_value({}, {})
 
 #    batch_scheduler_propuestas({}, {})
 
 #    construct_document_embeddings({}, {})
 
-#    scrape_news({'source': 'semana'}, {})
+#    scrape_news({'source': 'elespectador'}, {})
 #    get_candidate_sentiment({}, {})

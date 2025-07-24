@@ -685,44 +685,53 @@ def send_gmail(to_email, subject, body_text):
     return response.json()
 
 
+def store_df_as_parquet(df, s3_key, filename, partition, table_name):
+    s3 = boto3.client('s3')
+
+    # Save to parquet in memory
+    buffer = io.BytesIO()
+    df.to_parquet(buffer, index=False)
+    buffer.seek(0)
+
+    # Upload to S3
+    s3.put_object(Bucket="zarruk",
+                    Key=f"{s3_key}/{filename}.parquet",
+                    Body=buffer.getvalue())
+
+    print(f"Stored {len(df)} proposals to {s3_key}")
+
+    # Update Athena partition
+    partition_query = f"""
+    ALTER TABLE {table_name} ADD IF NOT EXISTS
+    PARTITION ({partition})
+    LOCATION 's3://zarruk/{s3_key}/'
+    """
+
+    print(f"Updating Athena query")
+    run_athena_query(
+        query=partition_query,
+        database=ATHENA_DB,
+        output_location=ATHENA_OUTPUT
+    )
+    print(f"Athena query updated successfully")
+
+
 def batch_scheduler_propuestas(queue_url, purge_queue):
     from datetime import datetime
-
-    s3 = boto3.client('s3')
+    import io
 
     df = get_df_from_queue(queue_url, purge_queue=False)
 
     if len(df)>0:
-        # Create CSV in memory
-        csv_buffer = io.StringIO()
-        df.to_csv(csv_buffer, index=False, header=False)
-
-        # Save to S3 (organized by date/hour)
+        # Get current timestamp for partitioning
         now = datetime.utcnow()
         dt = now.strftime('%Y-%m-%d')
         hr = now.strftime('%H')
         s3_key = f"proposals/date={dt}/hour={hr}"
 
-        s3.put_object(Bucket="zarruk",
-                      Key=f"{s3_key}/proposals.csv",
-                      Body=csv_buffer.getvalue())
+        partition = f"date='{dt}', hour='{hr}'"
 
-        print(f"Stored {len(df)} proposals to {s3_key}")
-
-        # 🔹 Construct Athena query based on whether partition info is provided
-        partition_query = f"""
-        ALTER TABLE propuestas_table ADD IF NOT EXISTS
-        PARTITION (date='{dt}', hour='{hr}')
-        LOCATION 's3://zarruk/{s3_key}/'
-        """
-
-        print(f"Updating Athena query")
-        run_athena_query(
-            query=partition_query,
-            database=ATHENA_DB,
-            output_location=ATHENA_OUTPUT
-        )
-        print(f"Athena query updated successfully")
+        store_df_as_parquet(df, s3_key, "proposals", partition, "propuestas_table")
 
     else:
         print(f"No new proposals to store")
@@ -788,3 +797,16 @@ def compute_closest_texts(target_embedding, embeddings, embedding_column='embedd
     top_similarities = similarities[top_indices]
 
     return top_indices, top_similarities
+
+
+def cargar_prompt(documento1, documento2, propuesta, nombre, email):
+    with open('prompt_analisis_propuestas.txt', 'r', encoding='utf-8') as file:
+        template = file.read()
+    
+    prompt_final = template.replace('{{DOCUMENTO_1}}', documento1)
+    prompt_final = prompt_final.replace('{{DOCUMENTO_2}}', documento2)
+    prompt_final = prompt_final.replace('{{PROPUESTA}}', propuesta)
+    prompt_final = prompt_final.replace('{{NOMBRE}}', nombre)
+    prompt_final = prompt_final.replace('{{EMAIL}}', email)
+    
+    return prompt_final
