@@ -270,10 +270,11 @@ def get_proposals_value(event, context):
 
         print(df_output)
 
-        print("Sending email to person...")
-        send_gmail(eval_dict['datos_proponente']['email'],
-                   eval_dict['comunicacion_proponente']['asunto'],
-                   eval_dict['comunicacion_proponente']['cuerpo_correo'])
+        if 'send_email' in event:
+            print("Sending email to person...")
+            send_gmail(eval_dict['datos_proponente']['email'],
+                    eval_dict['comunicacion_proponente']['asunto'],
+                    eval_dict['comunicacion_proponente']['cuerpo_correo'])
 
 
         df_all = pd.concat([df_all, df_output])
