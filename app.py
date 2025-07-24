@@ -234,7 +234,7 @@ def get_proposals_value(event, context):
                                df['correo'][i])
         
         print("LLM analyzing proposal...")
-        response = answer_question("", prompt, model_provider=event['model'])
+        response = answer_question("", prompt)
 
         print(response)
 
