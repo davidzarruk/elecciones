@@ -227,6 +227,7 @@ def get_proposals_value(event, context):
         text2 = read_pdf_from_s3("zarruk",
                                  f"documentos-programaticos/Documento - {df['closest_document_2'][i]}.pdf", clean_filename=True)
 
+        print(f"Owner: {df['nombre'][i]} \n Propuesta: {df['propuesta'][i]}")
         prompt = cargar_prompt(text1['content'], 
                                text2['content'], 
                                df['propuesta'][i], 
@@ -267,7 +268,7 @@ def get_proposals_value(event, context):
         # Crear DataFrame
         df_output = pd.DataFrame([df_dict])
 
-        print(df_output.columns)
+        print(df_output)
 
         print("Sending email to person...")
         send_gmail(eval_dict['datos_proponente']['email'],
