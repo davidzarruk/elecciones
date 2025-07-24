@@ -227,7 +227,6 @@ def get_proposals_value(event, context):
         text2 = read_pdf_from_s3("zarruk",
                                  f"documentos-programaticos/Documento - {df['closest_document_2'][i]}.pdf", clean_filename=True)
 
-        print(text1)
         prompt = cargar_prompt(text1['content'], 
                                text2['content'], 
                                df['propuesta'][i], 
@@ -241,7 +240,32 @@ def get_proposals_value(event, context):
 
         data_json = json.loads(extract_json(response))
 
-        df_output = pd.DataFrame(data_json)
+        # Extraer la evaluación
+        eval_dict = data_json['evaluacion']
+
+        # Crear un diccionario plano para el DataFrame
+        df_dict = {
+            'proposal_id': eval_dict['propuesta_original'][:10],  # primeros 10 caracteres como ID
+            'nombre': eval_dict['datos_proponente']['nombre'],
+            'email': eval_dict['datos_proponente']['email'],
+            'propuesta': eval_dict['propuesta_original'],
+            'decision': eval_dict['decision'],
+            'puntaje': eval_dict['puntaje_valor'],
+            'tema': eval_dict['tema_relacionado'],
+            'justificacion_aceptacion': eval_dict.get('justificacion_aceptacion', ''),
+            'justificacion_rechazo': eval_dict.get('justificacion_rechazo', ''),
+            'documento1_texto': eval_dict['incorporacion_propuesta']['documento_1'].get('texto_a_incorporar', ''),
+            'documento1_seccion': eval_dict['incorporacion_propuesta']['documento_1'].get('seccion_especifica', ''),
+            'documento2_texto': eval_dict['incorporacion_propuesta']['documento_2'].get('texto_a_incorporar', ''),
+            'documento2_seccion': eval_dict['incorporacion_propuesta']['documento_2'].get('seccion_especifica', ''),
+            'conflictos': eval_dict.get('conflictos', ''),
+            'elementos_no_evaluables': eval_dict.get('elementos_no_evaluables', ''),
+            'email_asunto': eval_dict['comunicacion_proponente']['asunto'],
+            'email_cuerpo': eval_dict['comunicacion_proponente']['cuerpo_correo']
+        }
+
+        # Crear DataFrame
+        df_output = pd.DataFrame([df_dict])
 
         print(df_output.columns)
 
