@@ -4,7 +4,7 @@ from utils import get_links, get_articles, update_db, \
     get_sentiment, read_df_from_s3, get_propuesta, clean_and_format_name, \
     query_athena_to_df, filter_new_by_candidate_names, send_gmail, batch_scheduler_propuestas, \
     generate_text_dataframe, read_all_files_from_s3_folder, compute_closest_texts, get_embedding, \
-    cargar_prompt, answer_question, extract_json, store_df_as_parquet
+    cargar_prompt, answer_question, extract_json, store_df_as_parquet, read_pdf_from_s3
 from params import NUM_NEWS, QUERY_PARAMS, ATHENA_TABLE, ATHENA_DB, ATHENA_OUTPUT, QUEUE_URL, \
     SUBJECT_EMAIL, RESPUESTAS_CORREO, REMITENTES
 import pandas as pd
@@ -211,11 +211,25 @@ def get_proposals_value(event, context):
 
     df = query_athena_to_df(query, database, output_location)
 
+
+    print(f"Getting embeddings from existing proposals...")
+    query = f"SELECT DISTINCT titulo, embedding FROM documentos_programaticos"
+    df_embeddings = query_athena_to_df(query, "news_db", "s3://zarruk/athena-results/")
+
+
     print("Iterating over documents...")
     df_all = pd.DataFrame()
     for i in range(len(df)):
-        prompt = cargar_prompt(df['closest_document_1'][i], 
-                               df['closest_document_2'][i], 
+
+        text1 = read_pdf_from_s3("zarruk",
+                                 f"documentos-programaticos/Documento - {df['closest_document_1'][i]}.pdf", clean_filename=True)
+
+        text2 = read_pdf_from_s3("zarruk",
+                                 f"documentos-programaticos/Documento - {df['closest_document_2'][i]}.pdf", clean_filename=True)
+
+        print(text1)
+        prompt = cargar_prompt(text1, 
+                               text2, 
                                df['propuesta'][i], 
                                df['nombre'][i], 
                                df['correo'][i])

@@ -197,6 +197,61 @@ def read_df_from_s3(bucket_name, key):
     return df
 
 
+def read_pdf_from_s3(bucket_name, file_key, clean_filename=True):
+    """
+    Reads a specific PDF file from S3 and extracts its text content.
+    
+    Args:
+        bucket_name (str): S3 bucket name
+        file_key (str): Complete path/key to the PDF file in the bucket
+        clean_filename (bool): If True, cleans the filename for display
+        
+    Returns:
+        dict: Contains 'key' (filename) and 'content' (PDF text)
+        
+    Raises:
+        Exception: If file doesn't exist or can't be processed
+    """
+    from pdfminer.high_level import extract_text as extract_pdf_text
+    import tempfile
+    
+    s3 = boto3.client('s3')
+    
+    try:
+        # Get the PDF file from S3
+        response = s3.get_object(Bucket=bucket_name, Key=file_key)
+        
+        # Create a temporary file to store the PDF
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.pdf') as tmp_file:
+            tmp_file.write(response['Body'].read())
+            tmp_file_path = tmp_file.name
+        
+        try:
+            # Extract text from the PDF
+            text = extract_pdf_text(tmp_file_path)
+            
+            # Clean filename if requested
+            if clean_filename:
+                filename = file_key.split('/')[-1]  # Get just the filename
+                filename = filename.replace("Documento - ", "").replace(".pdf", "")
+            else:
+                filename = file_key
+                
+            return {
+                'key': filename,
+                'content': text
+            }
+            
+        finally:
+            # Clean up: remove the temporary file
+            os.remove(tmp_file_path)
+            
+    except s3.exceptions.NoSuchKey:
+        raise Exception(f"File not found: {file_key}")
+    except Exception as e:
+        raise Exception(f"Error processing PDF file {file_key}: {str(e)}")
+
+
 def read_all_files_from_s3_folder(bucket_name, folder_prefix, file_extension=None):
     """
     Reads files from an S3 folder.
@@ -771,7 +826,7 @@ def generate_text_dataframe(text, title):
 
     embeddings.append(get_embedding(text[:16000]))
 
-    df_text = pd.DataFrame({'title': title, 'embedding': embeddings})
+    df_text = pd.DataFrame({'title': title, 'content': text, 'embedding': embeddings})
     return df_text
 
 
