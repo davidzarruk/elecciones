@@ -42,58 +42,60 @@ Genera una respuesta en formato JSON que incluya:
 {
     "evaluacion": {
         "datos_proponente": {
-            "nombre": "nombre completo",
-            "email": "correo electrónico"
+            "nombre": "string",
+            "email": "string"
         },
-        "propuesta_original": "texto de la propuesta",
+        "propuesta_original": "string",
         "documentos_analizados": {
-            "documento_1": "breve descripción del tema principal",
-            "documento_2": "breve descripción del tema principal",
-            "relacion_entre_documentos": "descripción de cómo se complementan o relacionan los documentos"
+            "documento_1": "string",
+            "documento_2": "string",
+            "relacion_entre_documentos": "string"
         },
-        "tema_relacionado": "área del programa a la que corresponde",
-        "decision": "ACEPTADA/RECHAZADA",
-        "justificacion_aceptacion": "si fue aceptada, explicación detallada basada en los documentos",
-        "justificacion_rechazo": "si fue rechazada, explicación detallada basada en los documentos",
-        "puntaje_valor": "número del 1 al 5, donde:
-            1 = No agrega valor significativo
-            2 = Agrega valor marginal
-            3 = Agrega valor moderado
-            4 = Agrega valor significativo
-            5 = Agrega valor excepcional",
+        "tema_relacionado": "string",
+        "decision": "string (ACEPTADA o RECHAZADA)",
+        "justificacion_aceptacion": "string",
+        "justificacion_rechazo": "string",
+        "puntaje_valor": "string", // IMPORTANTE: Debe ser "1", "2", "3", "4" o "5" como string
         "incorporacion_propuesta": {
             "documento_1": {
-                "texto_a_incorporar": "TEXTO LITERAL Y FINAL que se debe copiar y pegar en el documento, NO instrucciones ni resúmenes. Debe estar completamente redactado y listo para su incorporación directa",
-                "seccion_especifica": "título exacto de la sección donde se incorporará",
-                "parrafo_anterior": "cita textual de las primeras 10-15 palabras del párrafo que precede",
-                "parrafo_posterior": "cita textual de las primeras 10-15 palabras del párrafo que sigue",
-                "notas_edicion": "SOLO instrucciones técnicas de formato si son necesarias (ej: 'mantener el mismo tamaño de fuente', 'agregar viñeta al inicio')"
+                "texto_a_incorporar": "string",
+                "seccion_especifica": "string",
+                "parrafo_anterior": "string",
+                "parrafo_posterior": "string",
+                "notas_edicion": "string"
             },
             "documento_2": {
-                "texto_a_incorporar": "TEXTO LITERAL Y FINAL que se debe copiar y pegar en el documento, NO instrucciones ni resúmenes. Debe estar completamente redactado y listo para su incorporación directa",
-                "seccion_especifica": "título exacto de la sección donde se incorporará",
-                "parrafo_anterior": "cita textual de las primeras 10-15 palabras del párrafo que precede",
-                "parrafo_posterior": "cita textual de las primeras 10-15 palabras del párrafo que sigue",
-                "notas_edicion": "SOLO instrucciones técnicas de formato si son necesarias (ej: 'mantener el mismo tamaño de fuente', 'agregar viñeta al inicio')"
+                "texto_a_incorporar": "string",
+                "seccion_especifica": "string",
+                "parrafo_anterior": "string",
+                "parrafo_posterior": "string",
+                "notas_edicion": "string"
             }
         },
-        "conflictos": "si existen, listar conflictos específicos con otras partes del programa",
-        "elementos_no_evaluables": "lista de aspectos que no se pueden evaluar por falta de información en los documentos",
+        "conflictos": "string",
+        "elementos_no_evaluables": ["string"], // Array de strings
         "comunicacion_proponente": {
-            "para": "email del proponente",
-            "asunto": "Respuesta a su propuesta para el programa de gobierno",
-            "cuerpo_correo": "texto personalizado que debe incluir:
-                - Saludo personal usando el nombre proporcionado
-                - Agradecimiento por la participación
-                - Explicación clara de qué elementos de su propuesta serán incluidos en cada documento
-                - Descripción de cómo y dónde se incorporará en cada documento
-                - Explicación del valor que agrega su contribución
-                - Si aplica, explicación de qué elementos no se pudieron incluir y por qué
-                - Invitación a seguir participando
-                - Despedida cordial"
+            "para": "string",
+            "asunto": "string",
+            "cuerpo_correo": "string"
         }
     }
 }
+
+REGLAS ESTRICTAS DE FORMATO:
+1. TODOS los campos deben estar presentes
+2. TODOS los campos deben ser strings, incluyendo "puntaje_valor"
+3. "puntaje_valor" debe ser un string con un número del 1 al 5 ("1", "2", "3", "4" o "5")
+4. Los campos vacíos deben ser "" (string vacío)
+5. "elementos_no_evaluables" SIEMPRE debe ser un array con al menos un string
+6. NO usar null, undefined o cualquier otro valor especial
+7. NO usar números enteros, solo strings
+
+VALORES POR DEFECTO OBLIGATORIOS:
+- Campos de texto vacíos: ""
+- "elementos_no_evaluables": ["Sin elementos no evaluables"] o ["Información insuficiente para evaluación"]
+- "puntaje_valor": "1" (en caso de rechazo)
+- "decision": "RECHAZADA" (en caso de información insuficiente)
 </output_format>
 
 <response_rules>
@@ -179,6 +181,14 @@ REGLAS DE FORMATO DE DATOS:
    - Usar arrays con mensaje por defecto para listas
    - Nunca usar null o undefined
 </data_format_rules>
+
+<type_validation>
+VALIDACIÓN DE TIPOS:
+1. "puntaje_valor" DEBE ser un string ("1", "2", "3", "4" o "5")
+2. Todos los campos numéricos deben convertirse a string
+3. No usar números enteros en ningún campo
+4. Verificar que no hay valores numéricos sin convertir a string
+</type_validation>
 
 <communication_guidelines>
 - El correo debe ser cordial y motivador, manteniendo un tono profesional y agradecido
