@@ -854,7 +854,7 @@ def compute_closest_texts(target_embedding, embeddings, embedding_column='embedd
     return top_indices, top_similarities
 
 
-def cargar_prompt(documento1, documento2, propuesta, nombre, email):
+def cargar_prompt(documento1, documento2, propuesta, nombre, email, proposal_id):
     with open('prompt_analisis_propuestas.txt', 'r', encoding='utf-8') as file:
         template = file.read()
     
@@ -863,5 +863,6 @@ def cargar_prompt(documento1, documento2, propuesta, nombre, email):
     prompt_final = prompt_final.replace('{{PROPUESTA}}', propuesta)
     prompt_final = prompt_final.replace('{{NOMBRE}}', nombre)
     prompt_final = prompt_final.replace('{{EMAIL}}', email)
+    prompt_final = prompt_final.replace('{{PROPOSAL_ID}}', proposal_id)
     
     return prompt_final

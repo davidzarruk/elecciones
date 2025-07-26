@@ -202,7 +202,7 @@ def get_proposals_value(event, context):
     
     print("Reading proposals")
     query = """
-    SELECT nombre, correo, propuesta, closest_document_1, closest_document_2
+    SELECT proposal_id, nombre, correo, propuesta, closest_document_1, closest_document_2
     FROM propuestas_table
     """
 
@@ -232,7 +232,8 @@ def get_proposals_value(event, context):
                                text2['content'], 
                                df['propuesta'][i], 
                                df['nombre'][i], 
-                               df['correo'][i])
+                               df['correo'][i], 
+                               df['proposal_id'][i])
         
         print("LLM analyzing proposal...")
         response = answer_question("", prompt)
