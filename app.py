@@ -248,8 +248,8 @@ def get_proposals_value(event, context):
             'nombre': eval_dict['datos_proponente']['nombre'],
             'email': eval_dict['datos_proponente']['email'],
             'decision': eval_dict['decision'],
-            'justificacion_aceptacion': eval_dict['justificacion_aceptacion'],
-            'justificacion_rechazo': eval_dict['justificacion_rechazo'],
+            'justificacion': eval_dict['justificacion'],  # Unificado
+            'tema': eval_dict['tema'],  # Nuevo campo
             'puntaje': eval_dict['puntaje_valor'],
             'documento1_texto': eval_dict['incorporacion_propuesta']['documento_1']['texto_a_incorporar'],
             'documento1_seccion': eval_dict['incorporacion_propuesta']['documento_1']['seccion_especifica'],
