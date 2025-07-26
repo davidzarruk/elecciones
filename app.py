@@ -247,23 +247,19 @@ def get_proposals_value(event, context):
 
         # Crear un diccionario plano para el DataFrame
         df_dict = {
-            'proposal_id': eval_dict['propuesta_original'][:100],  # primeros 10 caracteres como ID
-            'nombre': eval_dict['datos_proponente']['nombre'],
-            'email': eval_dict['datos_proponente']['email'],
-            'propuesta': eval_dict['propuesta_original'],
-            'decision': eval_dict['decision'],
-            'puntaje': eval_dict['puntaje_valor'],
-            'tema': eval_dict['tema_relacionado'],
-            'justificacion_aceptacion': eval_dict.get('justificacion_aceptacion', ''),
-            'justificacion_rechazo': eval_dict.get('justificacion_rechazo', ''),
-            'documento1_texto': eval_dict['incorporacion_propuesta']['documento_1'].get('texto_a_incorporar', ''),
-            'documento1_seccion': eval_dict['incorporacion_propuesta']['documento_1'].get('seccion_especifica', ''),
-            'documento2_texto': eval_dict['incorporacion_propuesta']['documento_2'].get('texto_a_incorporar', ''),
-            'documento2_seccion': eval_dict['incorporacion_propuesta']['documento_2'].get('seccion_especifica', ''),
-            'conflictos': eval_dict.get('conflictos', ''),
-            'elementos_no_evaluables': eval_dict.get('elementos_no_evaluables', ''),
-            'email_asunto': eval_dict['comunicacion_proponente']['asunto'],
-            'email_cuerpo': eval_dict['comunicacion_proponente']['cuerpo_correo']
+            'proposal_id': eval_dict['evaluacion']['datos_proponente']['proposal_id'],
+            'nombre': eval_dict['evaluacion']['datos_proponente']['nombre'],
+            'email': eval_dict['evaluacion']['datos_proponente']['email'],
+            'decision': eval_dict['evaluacion']['decision'],
+            'justificacion_aceptacion': eval_dict['evaluacion']['justificacion_aceptacion'],
+            'justificacion_rechazo': eval_dict['evaluacion']['justificacion_rechazo'],
+            'puntaje': eval_dict['evaluacion']['puntaje_valor'],
+            'documento1_texto': eval_dict['evaluacion']['incorporacion_propuesta']['documento_1']['texto_a_incorporar'],
+            'documento1_seccion': eval_dict['evaluacion']['incorporacion_propuesta']['documento_1']['seccion_especifica'],
+            'documento2_texto': eval_dict['evaluacion']['incorporacion_propuesta']['documento_2']['texto_a_incorporar'],
+            'documento2_seccion': eval_dict['evaluacion']['incorporacion_propuesta']['documento_2']['seccion_especifica'],
+            'email_asunto': eval_dict['evaluacion']['comunicacion_proponente']['asunto'],
+            'email_cuerpo': eval_dict['evaluacion']['comunicacion_proponente']['cuerpo_correo']
         }
 
         # Crear DataFrame
