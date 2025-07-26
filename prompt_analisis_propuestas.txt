@@ -17,37 +17,35 @@ Actúa como un analista experto en políticas públicas. Evalúa propuestas ciud
 
 <output_format>
 {
-    "evaluacion": {
-        "datos_proponente": {
-            "nombre": "string",
-            "email": "string",
-            "proposal_id": "string"
+    "datos_proponente": {
+        "nombre": "string",
+        "email": "string",
+        "proposal_id": "string"
+    },
+    "decision": "string (ACEPTADA o RECHAZADA)",
+    "justificacion_aceptacion": "string",
+    "justificacion_rechazo": "string",
+    "puntaje_valor": "string (1-5)",
+    "incorporacion_propuesta": {
+        "documento_1": {
+            "texto_a_incorporar": "string",
+            "seccion_especifica": "string",
+            "parrafo_anterior": "string",
+            "parrafo_posterior": "string",
+            "notas_edicion": "string"
         },
-        "decision": "string (ACEPTADA o RECHAZADA)",
-        "justificacion_aceptacion": "string",
-        "justificacion_rechazo": "string",
-        "puntaje_valor": "string (1-5)",
-        "incorporacion_propuesta": {
-            "documento_1": {
-                "texto_a_incorporar": "string",
-                "seccion_especifica": "string",
-                "parrafo_anterior": "string",
-                "parrafo_posterior": "string",
-                "notas_edicion": "string"
-            },
-            "documento_2": {
-                "texto_a_incorporar": "string",
-                "seccion_especifica": "string",
-                "parrafo_anterior": "string",
-                "parrafo_posterior": "string",
-                "notas_edicion": "string"
-            }
-        },
-        "comunicacion_proponente": {
-            "para": "string",
-            "asunto": "string",
-            "cuerpo_correo": "string"
+        "documento_2": {
+            "texto_a_incorporar": "string",
+            "seccion_especifica": "string",
+            "parrafo_anterior": "string",
+            "parrafo_posterior": "string",
+            "notas_edicion": "string"
         }
+    },
+    "comunicacion_proponente": {
+        "para": "string",
+        "asunto": "string",
+        "cuerpo_correo": "string"
     }
 }
 </output_format>
