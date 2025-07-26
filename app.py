@@ -4,7 +4,8 @@ from utils import get_links, get_articles, update_db, \
     get_sentiment, read_df_from_s3, get_propuesta, clean_and_format_name, \
     query_athena_to_df, filter_new_by_candidate_names, send_gmail, batch_scheduler_propuestas, \
     generate_text_dataframe, read_all_files_from_s3_folder, compute_closest_texts, get_embedding, \
-    cargar_prompt, answer_question, extract_json, store_df_as_parquet, read_pdf_from_s3
+    cargar_prompt, answer_question, extract_json, store_df_as_parquet, read_pdf_from_s3, \
+    clean_json_string
 from params import NUM_NEWS, QUERY_PARAMS, ATHENA_TABLE, ATHENA_DB, ATHENA_OUTPUT, QUEUE_URL, \
     SUBJECT_EMAIL, RESPUESTAS_CORREO, REMITENTES
 import pandas as pd
@@ -240,7 +241,7 @@ def get_proposals_value(event, context):
 
         print(response)
 
-        eval_dict = json.loads(extract_json(response))
+        eval_dict = json.loads(clean_json_string(extract_json(response)))
 
         # Crear un diccionario plano para el DataFrame
         df_dict = {

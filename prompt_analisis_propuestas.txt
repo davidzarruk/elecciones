@@ -53,28 +53,36 @@ compatibilidad con el programa de gobierno existente, basándote ÚNICAMENTE en 
 <rules>
 1. FORMATO:
    - TODOS los campos deben estar presentes
-   - TODOS los campos deben ser strings
+   - TODOS los campos deben ser strings EN UNA SOLA LÍNEA
+   - NO usar saltos de línea dentro de los valores de string
+   - Para textos largos: usar espacios en lugar de enter/saltos de línea
    - Campos vacíos: usar ""
    - "puntaje_valor": usar "1", "2", "3", "4" o "5"
    - "decision": usar "ACEPTADA" o "RECHAZADA"
 
-2. EVIDENCIA:
+2. CARACTERES PROHIBIDOS EN STRINGS:
+   - NO usar \n (salto de línea)
+   - NO usar \t (tab)
+   - NO usar comillas dobles sin escapar
+   - Si necesitas separar párrafos: usar " | "
+
+3. EVIDENCIA:
    - Toda justificación debe incluir citas textuales de los documentos
    - Si no hay evidencia suficiente en los documentos, rechazar
 
-3. RECHAZO AUTOMÁTICO si la propuesta:
+4. RECHAZO AUTOMÁTICO si la propuesta:
    - Contradice principios establecidos
    - Va contra políticas definidas
    - No tiene información suficiente en los documentos
    - Genera contradicciones
 
-4. EN CASO DE RECHAZO:
+5. EN CASO DE RECHAZO:
    - "decision": "RECHAZADA"
    - "puntaje_valor": "1"
    - Completar "justificacion" con citas específicas
    - Usar "" en campos de incorporación
 
-5. COMUNICACIÓN:
+6. COMUNICACIÓN:
    - Tono cordial y profesional
    - Explicar decisión con base en los documentos
    - Personalizar usando el nombre del proponente

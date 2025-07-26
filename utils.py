@@ -866,3 +866,16 @@ def cargar_prompt(documento1, documento2, propuesta, nombre, email, proposal_id)
     prompt_final = prompt_final.replace('{{PROPOSAL_ID}}', proposal_id)
     
     return prompt_final
+
+
+def clean_json_string(json_str):
+    """Limpia caracteres de control problemáticos del JSON"""
+    # Reemplazar saltos de línea dentro de strings con espacios
+    json_str = re.sub(r'(?<!\\)\n', ' ', json_str)
+    # Reemplazar tabs con espacios
+    json_str = re.sub(r'\t', ' ', json_str)
+    # Reemplazar múltiples espacios con uno solo
+    json_str = re.sub(r'\s+', ' ', json_str)
+    # Limpiar caracteres de control problemáticos
+    json_str = re.sub(r'[\x00-\x1f\x7f-\x9f]', '', json_str)
+    return json_str
