@@ -151,6 +151,7 @@ En caso de rechazo o información insuficiente, usar estos valores:
 - "parrafo_posterior": ""
 - "notas_edicion": ""
 - "conflictos": ""
+- "elementos_no_evaluables": ["Información insuficiente para evaluación completa"]
 </default_values>
 
 <validation_check>
@@ -161,6 +162,23 @@ Antes de enviar tu respuesta, verifica que:
 4. Si la decisión es "RECHAZADA", existe una justificación
 5. El correo al proponente está completo y es coherente con la decisión
 </validation_check>
+
+<data_format_rules>
+REGLAS DE FORMATO DE DATOS:
+1. Todos los campos de texto deben ser strings válidos
+2. Los campos de lista deben ser arrays JSON válidos, nunca vacíos:
+   - "elementos_no_evaluables": siempre debe ser un array de strings
+   - Si no hay elementos, usar ["Sin elementos no evaluables"]
+   - Si hay elementos, cada uno debe ser un string
+3. Campos numéricos:
+   - "puntaje_valor": debe ser un número entero del 1 al 5
+4. Campos de decisión:
+   - "decision": solo puede ser "ACEPTADA" o "RECHAZADA"
+5. En caso de información faltante:
+   - Usar strings vacíos ("") para campos de texto
+   - Usar arrays con mensaje por defecto para listas
+   - Nunca usar null o undefined
+</data_format_rules>
 
 <communication_guidelines>
 - El correo debe ser cordial y motivador, manteniendo un tono profesional y agradecido
