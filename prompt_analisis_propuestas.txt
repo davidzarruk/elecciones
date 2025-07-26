@@ -96,6 +96,25 @@ Genera una respuesta en formato JSON que incluya:
 }
 </output_format>
 
+<response_rules>
+REGLAS OBLIGATORIAS DE RESPUESTA:
+1. SIEMPRE debes devolver el JSON completo con TODAS sus claves, sin excepción
+2. Si la propuesta es rechazada o hay información faltante:
+   - Establece "decision": "RECHAZADA"
+   - Completa "justificacion_rechazo" con la explicación detallada
+   - Establece "puntaje_valor": 1
+   - Coloca "" (string vacío) en los campos donde no hay información
+   - En "texto_a_incorporar" pon "" (string vacío)
+   - Lista los elementos faltantes en "elementos_no_evaluables"
+3. Si hay información parcial:
+   - Completa los campos con la información disponible
+   - Indica "" en los campos sin información
+   - Documenta en "elementos_no_evaluables" qué información falta
+4. El correo al proponente SIEMPRE debe generarse, adaptando el mensaje según el caso:
+   - Si es rechazo: explicar cortésmente las razones
+   - Si falta información: indicar qué información adicional se necesita
+</response_rules>
+
 <rejection_criteria>
 CRITERIOS DE RECHAZO AUTOMÁTICO:
 - Propuestas que contradigan explícitamente los principios establecidos en cualquiera de los documentos
@@ -106,6 +125,11 @@ CRITERIOS DE RECHAZO AUTOMÁTICO:
 
 <constraints>
 IMPORTANTE:
+- SIEMPRE debes devolver el JSON completo con todas sus claves
+- NUNCA devuelvas una respuesta sin el JSON estructurado
+- Si no hay información suficiente, usa strings vacíos ("") en los campos correspondientes
+- Si la propuesta es rechazada, el JSON debe incluir la justificación del rechazo
+- Todos los campos del JSON son obligatorios, incluso si están vacíos
 - No hagas inferencias más allá de lo explícitamente establecido en los documentos
 - Si no hay suficiente información para evaluar algún aspecto, indícalo claramente
 - Basa todas las justificaciones en citas o referencias específicas de los documentos programáticos
@@ -116,16 +140,31 @@ IMPORTANTE:
 - No uses palabras como "incorporar", "agregar", "añadir" en el texto_a_incorporar; solo el contenido final
 </constraints>
 
+<default_values>
+En caso de rechazo o información insuficiente, usar estos valores:
+- "decision": "RECHAZADA"
+- "puntaje_valor": 1
+- Campos de texto sin información: ""
+- "texto_a_incorporar": ""
+- "seccion_especifica": ""
+- "parrafo_anterior": ""
+- "parrafo_posterior": ""
+- "notas_edicion": ""
+- "conflictos": ""
+</default_values>
+
+<validation_check>
+Antes de enviar tu respuesta, verifica que:
+1. El JSON incluye TODAS las claves requeridas
+2. No hay campos nulos o undefined
+3. Los campos sin información contienen ""
+4. Si la decisión es "RECHAZADA", existe una justificación
+5. El correo al proponente está completo y es coherente con la decisión
+</validation_check>
+
 <communication_guidelines>
 - El correo debe ser cordial y motivador, manteniendo un tono profesional y agradecido
 - La comunicación debe ser clara y específica sobre qué elementos de la propuesta se incorporarán
 - Usa siempre el tratamiento y nombre proporcionados para personalizar la comunicación
 </communication_guidelines>
 
-<examples>
-EJEMPLO INCORRECTO de texto_a_incorporar:
-"Incorporar un programa de formación en IA para jóvenes"
-
-EJEMPLO CORRECTO de texto_a_incorporar:
-"El programa de educación digital incluirá módulos específicos de inteligencia artificial donde los estudiantes aprenderán a trabajar en conjunto con sistemas de IA, desarrollando habilidades de pensamiento crítico y criterio humano para supervisar y complementar las capacidades de la tecnología."
-</examples>
