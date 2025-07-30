@@ -237,7 +237,10 @@ def get_proposals_value(event, context):
                                propuestas)
         
         print("LLM analyzing proposal...")
-        response = answer_question("", prompt)
+        if 'model' in event:
+            response = answer_question("", prompt, model_choice=event['model'])
+        else:
+            response = answer_question("", prompt)
 
         print(response)
 
@@ -317,7 +320,7 @@ if __name__ == "__main__":
 #                    'nombre': 'david zarruk',
 #                    'correo': 'davidzarruk@gmail.com'}, {})
 
-    get_proposals_value({}, {})
+    get_proposals_value({'model': 'claude'}, {})
 
 #    batch_scheduler_propuestas({}, {})
 

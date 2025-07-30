@@ -56,31 +56,56 @@ def query_athena_to_df(query, database, output_location):
     return df
 
 
-def answer_question(question, prompt_data, tokens=1000):
-    from openai import OpenAI
-
-    client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
-
-    modelId = "gpt-4o"
-
-    input = {
-        "modelId": modelId,
-        "contentType": "application/json",
-        "accept": "*/*"
-    }
+def answer_question(question, prompt_data, model_choice="openai", tokens=4096):
+    if model_choice == "openai":
+        from openai import OpenAI
+        
+        client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+        
+        completion = client.chat.completions.create(
+            model="gpt-4",
+            messages=[
+                {
+                    "role": "user",
+                    "content": prompt_data + " " + question
+                }
+            ]
+        )
+        
+        response_body = completion.choices[0].message.content
+        
+    elif model_choice == "claude":
+        import boto3
+        import json
+        
+        bedrock = boto3.client(
+            service_name='bedrock-runtime',
+            region_name='us-east-1'
+        )
+        
+        body = json.dumps({
+            "anthropic_version": "bedrock-2023-05-31",
+            "max_tokens": tokens,
+            "messages": [
+                {
+                    "role": "user",
+                    "content": prompt_data + " " + question
+                }
+            ]
+        })
+        
+        response = bedrock.invoke_model(
+            modelId="anthropic.claude-3-sonnet-20240229-v1:0",  # nuevo modelo Claude 3
+            body=body,
+            contentType="application/json",
+            accept="application/json"
+        )
+        
+        response_body = json.loads(response['body'].read())['content'][0]['text']
+        
+    else:
+        raise ValueError("model_choice debe ser 'openai' o 'claude'")
     
-    completion = client.chat.completions.create(
-        model=input['modelId'],
-        messages=[
-            {
-                "role": "user",
-                "content": prompt_data + " " + question
-            }
-        ]
-    )
-
-    response_body = completion.choices[0].message.content
-
     return response_body
 
 
