@@ -212,29 +212,29 @@ def get_proposals_value(event, context):
 
     df = query_athena_to_df(query, database, output_location)
 
+    propuestas = [
+        {
+            'propuesta': row['propuesta'],
+            'nombre': row['nombre'],
+            'email': row['correo'],
+            'proposal_id': row['proposal_id']
+        }
+        for _, row in df.iterrows()
+    ]
 
     print(f"Getting embeddings from existing proposals...")
-    query = f"SELECT DISTINCT titulo, embedding FROM documentos_programaticos"
+    query = f"SELECT DISTINCT title, content FROM documentos_programaticos"
     df_embeddings = query_athena_to_df(query, "news_db", "s3://zarruk/athena-results/")
 
 
     print("Iterating over documents...")
     df_all = pd.DataFrame()
-    for i in range(len(df)):
+    for i in range(len(df_embeddings)):
 
-        text1 = read_pdf_from_s3("zarruk",
-                                 f"documentos-programaticos/Documento - {df['closest_document_1'][i]}.pdf", clean_filename=True)
+        print(f"Documento {df_embeddings['title'][i]}")
 
-        text2 = read_pdf_from_s3("zarruk",
-                                 f"documentos-programaticos/Documento - {df['closest_document_2'][i]}.pdf", clean_filename=True)
-
-        print(f"Owner: {df['nombre'][i]} \n Propuesta: {df['propuesta'][i]}")
-        prompt = cargar_prompt(text1['content'], 
-                               text2['content'], 
-                               df['propuesta'][i], 
-                               df['nombre'][i], 
-                               df['correo'][i], 
-                               df['proposal_id'][i])
+        prompt = cargar_prompt(df_embeddings['content'][i],
+                               propuestas)
         
         print("LLM analyzing proposal...")
         response = answer_question("", prompt)
@@ -242,6 +242,7 @@ def get_proposals_value(event, context):
         print(response)
 
         eval_dict = json.loads(clean_json_string(extract_json(response)))
+
 
         # Crear un diccionario plano para el DataFrame
         df_dict = {
@@ -262,8 +263,6 @@ def get_proposals_value(event, context):
 
         # Crear DataFrame
         df_output = pd.DataFrame([df_dict])
-
-        print(df_output)
 
         if 'send_email' in event:
             print("Sending email to person...")
@@ -305,10 +304,11 @@ def construct_document_embeddings(event, context):
 
     folder = "documentos-programaticos-processed"
 
-    update_db(df_text,
-              folder,
-              'documentos_programaticos', ATHENA_DB, ATHENA_OUTPUT
-              )
+    store_df_as_parquet(df_text,
+                        folder,
+                        "propuestas",
+                        "", "propuestas_analyzed")
+
 
 if __name__ == "__main__":
 
@@ -317,7 +317,7 @@ if __name__ == "__main__":
 #                    'nombre': 'david zarruk',
 #                    'correo': 'davidzarruk@gmail.com'}, {})
 
-    get_proposals_value({'model': 'claude'}, {})
+    get_proposals_value({}, {})
 
 #    batch_scheduler_propuestas({}, {})
 

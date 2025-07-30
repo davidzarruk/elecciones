@@ -755,12 +755,18 @@ def store_df_as_parquet(df, s3_key, filename, partition, table_name):
 
     print(f"Stored {len(df)} proposals to {s3_key}")
 
-    # Update Athena partition
-    partition_query = f"""
-    ALTER TABLE {table_name} ADD IF NOT EXISTS
-    PARTITION ({partition})
-    LOCATION 's3://zarruk/{s3_key}/'
-    """
+    if partition!="":
+        # Update Athena partition
+        partition_query = f"""
+        ALTER TABLE {table_name} ADD IF NOT EXISTS
+        PARTITION ({partition})
+        LOCATION 's3://zarruk/{s3_key}/'
+        """
+    else:
+        partition_query = f"""
+        ALTER TABLE {table_name}
+        SET LOCATION 's3://zarruk/{s3_key}/'
+        """
 
     print(f"Updating Athena query")
     run_athena_query(
@@ -854,16 +860,27 @@ def compute_closest_texts(target_embedding, embeddings, embedding_column='embedd
     return top_indices, top_similarities
 
 
-def cargar_prompt(documento1, documento2, propuesta, nombre, email, proposal_id):
+def cargar_prompt(documento, propuestas):
+    """
+    Args:
+        documento (str): El texto del documento
+        propuestas (list): Lista de diccionarios con las propuestas
+            Cada diccionario debe tener:
+            {
+                'propuesta': str,
+                'nombre': str,
+                'email': str,
+                'proposal_id': str
+            }
+    """
     with open('prompt_analisis_propuestas.txt', 'r', encoding='utf-8') as file:
         template = file.read()
     
-    prompt_final = template.replace('{{DOCUMENTO_1}}', documento1)
-    prompt_final = prompt_final.replace('{{DOCUMENTO_2}}', documento2)
-    prompt_final = prompt_final.replace('{{PROPUESTA}}', propuesta)
-    prompt_final = prompt_final.replace('{{NOMBRE}}', nombre)
-    prompt_final = prompt_final.replace('{{EMAIL}}', email)
-    prompt_final = prompt_final.replace('{{PROPOSAL_ID}}', proposal_id)
+    # Convertir la lista de propuestas a formato JSON string
+    propuestas_json = json.dumps(propuestas, ensure_ascii=False, indent=4)
+    
+    prompt_final = template.replace('{{DOCUMENTO}}', documento)
+    prompt_final = prompt_final.replace('{{PROPUESTAS}}', propuestas_json)
     
     return prompt_final
 
