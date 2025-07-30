@@ -63,7 +63,7 @@ def answer_question(question, prompt_data, model_choice="openai", tokens=4096):
         client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
         
         completion = client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4o",
             messages=[
                 {
                     "role": "user",
