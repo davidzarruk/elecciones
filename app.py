@@ -247,43 +247,33 @@ def get_proposals_value(event, context):
         eval_dict = json.loads(clean_json_string(extract_json(response)))
 
 
-        # Crear un diccionario plano para el DataFrame
-        df_dict = {
-            'proposal_id': eval_dict['datos_proponente']['proposal_id'],
-            'nombre': eval_dict['datos_proponente']['nombre'],
-            'email': eval_dict['datos_proponente']['email'],
-            'decision': eval_dict['decision'],
-            'justificacion': eval_dict['justificacion'],  # Unificado
-            'tema': eval_dict['tema'],  # Nuevo campo
-            'puntaje': eval_dict['puntaje_valor'],
-            'documento1_texto': eval_dict['incorporacion_propuesta']['documento_1']['texto_a_incorporar'],
-            'documento1_seccion': eval_dict['incorporacion_propuesta']['documento_1']['seccion_especifica'],
-            'documento2_texto': eval_dict['incorporacion_propuesta']['documento_2']['texto_a_incorporar'],
-            'documento2_seccion': eval_dict['incorporacion_propuesta']['documento_2']['seccion_especifica'],
-            'email_asunto': eval_dict['comunicacion_proponente']['asunto'],
-            'email_cuerpo': eval_dict['comunicacion_proponente']['cuerpo_correo']
-        }
+        for propuesta in propuestas:
+            # Crear un diccionario plano para el DataFrame
+            df_dict = {
+                'tema': df_embeddings['title'][i],
+                'decision': eval_dict[propuesta['proposal_id']]['decision'],
+                'justificacion': eval_dict[propuesta['proposal_id']]['justificacion'],
+                'puntaje': eval_dict[propuesta['proposal_id']]['puntaje_valor'],
+                'texto_a_incorporar': eval_dict[propuesta['proposal_id']]['incorporacion_propuesta']['texto_a_incorporar'],
+                'seccion_especifica': eval_dict[propuesta['proposal_id']]['incorporacion_propuesta']['seccion_especifica'],
+                'parrafo_anterior': eval_dict[propuesta['proposal_id']]['incorporacion_propuesta']['parrafo_anterior'],
+                'email_asunto': eval_dict[propuesta['proposal_id']]['comunicacion_proponente']['asunto'],
+                'email_cuerpo': eval_dict[propuesta['proposal_id']]['comunicacion_proponente']['cuerpo_correo']
+            }
 
-        # Crear DataFrame
-        df_output = pd.DataFrame([df_dict])
+            # Crear DataFrame
+            df_output = pd.DataFrame([df_dict])
 
-        if 'send_email' in event:
-            print("Sending email to person...")
-            send_gmail(eval_dict['datos_proponente']['email'],
-                    eval_dict['comunicacion_proponente']['asunto'],
-                    eval_dict['comunicacion_proponente']['cuerpo_correo'])
+            df_all = pd.concat([df_all, df_output])
 
+    now = datetime.utcnow()
+    dt = now.strftime('%Y-%m-%d')
+    hr = now.strftime('%H')
+    s3_key = f"proposals_analyzed/date={dt}/hour={hr}"
 
-        df_all = pd.concat([df_all, df_output])
+    partition = f"date='{dt}', hour='{hr}'"
 
-        now = datetime.utcnow()
-        dt = now.strftime('%Y-%m-%d')
-        hr = now.strftime('%H')
-        s3_key = f"proposals_analyzed/date={dt}/hour={hr}"
-
-        partition = f"date='{dt}', hour='{hr}'"
-
-        store_df_as_parquet(df_all, s3_key, "propuestas", partition, "propuestas_analyzed")
+    store_df_as_parquet(df_all, s3_key, "propuestas", partition, "propuestas_analyzed")
 
 
 

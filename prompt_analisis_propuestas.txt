@@ -25,34 +25,26 @@ de cada evaluación con instrucciones precisas de dónde y cómo incorporar las 
 
 <output_format>
 {
-    "evaluaciones": {
-        "[proposal_id_1]": {
-            "datos_proponente": {
-                "nombre": "string",
-                "email": "string",
-                "proposal_id": "string"
-            },
-            "decision": "string (ACEPTADA o RECHAZADA)",
-            "justificacion": "string (incluir citas textuales)",
-            "tema": "string",
-            "puntaje_valor": "string (1-5)",
-            "incorporacion_propuesta": {
-                "texto_a_incorporar": "string",
-                "seccion_especifica": "string",
-                "parrafo_anterior": "string",
-                "parrafo_posterior": "string",
-                "instrucciones_especificas": "string (instrucciones precisas de cómo incorporar el texto)"
-            },
-            "comunicacion_proponente": {
-                "asunto": "string",
-                "cuerpo_correo": "string"
-            }
+    "[proposal_id_1]": {
+        "decision": "string (ACEPTADA o RECHAZADA)",
+        "justificacion": "string (incluir citas textuales)",
+        "puntaje_valor": "string (1-5)",
+        "incorporacion_propuesta": {
+            "texto_a_incorporar": "string",
+            "seccion_especifica": "string",
+            "parrafo_anterior": "string",
+            "parrafo_posterior": "string",
+            "instrucciones_especificas": "string (instrucciones precisas de cómo incorporar el texto)"
         },
-        "[proposal_id_2]": {
-            // mismo formato que arriba
-        },
-        ...
-    }
+        "comunicacion_proponente": {
+            "asunto": "string",
+            "cuerpo_correo": "string"
+        }
+    },
+    "[proposal_id_2]": {
+        // mismo formato que arriba
+    },
+    ...
 }
 </output_format>
 
