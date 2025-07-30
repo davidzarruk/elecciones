@@ -21,6 +21,11 @@ de cada evaluación con instrucciones precisas de dónde y cómo incorporar las 
    específicas de incorporación
 
 4. Basa toda justificación en citas textuales del documento
+
+5. OBLIGATORIO: Procesar y retornar evaluación para TODAS las propuestas recibidas
+   - Verificar que cada proposal_id en las propuestas tenga su evaluación
+   - No omitir ninguna propuesta
+   - Si hay algún error procesando una propuesta, retornar como RECHAZADA con justificación
 </task>
 
 <output_format>
@@ -90,6 +95,19 @@ de cada evaluación con instrucciones precisas de dónde y cómo incorporar las 
    - Explicar decisión con base en los documentos
    - Personalizar usando el nombre del proponente
 
+7. COMPLETITUD OBLIGATORIA:
+   - DEBE existir una evaluación para CADA propuesta recibida
+   - El número de evaluaciones DEBE ser igual al número de propuestas
+   - Todos los proposal_ids del input DEBEN aparecer en las evaluaciones
+   - Si hay error procesando una propuesta específica:
+     * NO omitir la propuesta
+     * Marcar como "RECHAZADA"
+     * Incluir en justificación: "Error en procesamiento: [descripción del error]"
+     * Usar campos vacíos ("") donde corresponda
+   - Verificar antes de retornar que:
+     * Todos los IDs están presentes
+     * Todas las propuestas tienen evaluación completa
+     * No falta ninguna propuesta por procesar
 </rules>
 
 
