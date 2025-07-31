@@ -16,6 +16,7 @@ import json
 import boto3
 import uuid
 import time
+import numpy as np
 
 
 def scrape_news(event, context):
@@ -212,6 +213,13 @@ def get_proposals_value(event, context):
 
     df = query_athena_to_df(query, database, output_location)
 
+    unique_docs = pd.concat([
+        df['closest_document_1'],
+        df['closest_document_2']
+    ]).unique()
+
+    print(unique_docs)
+
     propuestas = [
         {
             'propuesta': row['propuesta'],
@@ -225,7 +233,7 @@ def get_proposals_value(event, context):
     print(f"Getting embeddings from existing proposals...")
     query = f"SELECT DISTINCT title, content FROM documentos_programaticos"
     df_embeddings = query_athena_to_df(query, "news_db", "s3://zarruk/athena-results/")
-
+    df_embeddings = df_embeddings.loc[df_embeddings['title'].isin(unique_docs)].reset_index(drop=True)
 
     print("Iterating over documents...")
     df_all = pd.DataFrame()
