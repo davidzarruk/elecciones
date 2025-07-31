@@ -116,6 +116,7 @@ de cada evaluación con instrucciones precisas de dónde y cómo incorporar las 
      * Todos los IDs están presentes
      * Todas las propuestas tienen evaluación completa
      * No falta ninguna propuesta por procesar
+     * El JSON de respuesta tenga el formato apropiado
 
 8. FILTRO RIGUROSO:
    - No aceptar reformulaciones superficiales ni duplicaciones de contenido existente
