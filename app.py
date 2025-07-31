@@ -231,7 +231,7 @@ def get_proposals_value(event, context):
     df_all = pd.DataFrame()
     for i in range(len(df_embeddings)):
 
-        print(f"Documento {df_embeddings['title'][i]}")
+        print(f"Documento {df_embeddings['title'][i]} (número {i} de un total de {len(df_embeddings)})")
 
         prompt = cargar_prompt(df_embeddings['content'][i],
                                propuestas)
@@ -241,8 +241,6 @@ def get_proposals_value(event, context):
             response = answer_question("", prompt, model_choice=event['model'])
         else:
             response = answer_question("", prompt)
-
-        print(response)
 
         eval_dict = json.loads(clean_json_string(extract_json(response)))
 
