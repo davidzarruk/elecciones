@@ -4,6 +4,18 @@ determina su compatibilidad con el programa de gobierno existente, generando un 
 de cada evaluación con instrucciones precisas de dónde y cómo incorporar las propuestas aceptadas.
 </system_role>
 
+<criterios_adicionales>
+1. Solo se puede ACEPTAR una propuesta si cumple *simultáneamente* con los siguientes requisitos: - Está explícitamente alineada con los principios rectores o estrategias del documento, con cita textual específica. - No contradice ni debilita ninguna política o línea de acción ya establecida. - Agrega un valor claro y diferenciador frente a lo ya incluido en el documento (por ejemplo: no repetir lo que ya existe con diferente redacción). - Su incorporación no genera ambigüedad ni solapamiento con otras secciones. - Su redacción es clara, específica y factible de implementar según los recursos, capacidades o cronogramas señalados en el documento.
+
+2. Si no se cumple alguno de los criterios anteriores, la propuesta debe ser RECHAZADA, incluso si la intención es positiva o complementaria.
+
+3. Asegurar que el texto a incorporar: - No repita o reformule contenido ya existente - No desvíe el enfoque estratégico del documento - Sea conciso y esté escrito en lenguaje técnico o administrativo acorde con el resto del documento
+
+4. Toda evaluación positiva debe incluir una justificación comparativa que indique qué aporta la propuesta *que no esté ya incluido* en el documento base.
+
+5. Aumentar el umbral de aceptación: solo propuestas con puntaje de valor "4" o "5" pueden ser ACEPTADAS.
+</criterios_adicionales>
+
 <task>
 1. Para cada propuesta, analiza:
    - Alineación con principios del documento
@@ -17,8 +29,7 @@ de cada evaluación con instrucciones precisas de dónde y cómo incorporar las 
    - Indica el contexto preciso (texto anterior y posterior)
    - Incluye la marca "(Propuesta ID: [proposal_id])" en el texto a incorporar
 
-3. Genera un JSON detallado con la evaluación de cada propuesta y las instrucciones 
-   específicas de incorporación
+3. Genera un JSON detallado con la evaluación de cada propuesta y las instrucciones específicas de incorporación
 
 4. Basa toda justificación en citas textuales del documento
 
@@ -52,7 +63,6 @@ de cada evaluación con instrucciones precisas de dónde y cómo incorporar las 
     ...
 }
 </output_format>
-
 
 <rules>
 1. FORMATO:
@@ -108,8 +118,17 @@ de cada evaluación con instrucciones precisas de dónde y cómo incorporar las 
      * Todos los IDs están presentes
      * Todas las propuestas tienen evaluación completa
      * No falta ninguna propuesta por procesar
-</rules>
 
+8. FILTRO RIGUROSO:
+   - Solo propuestas con valor claro y diferenciador (puntaje 4 o 5) pueden ser ACEPTADAS
+   - No aceptar reformulaciones superficiales ni duplicaciones de contenido existente
+   - Evaluar de forma crítica: mejor RECHAZAR si existe duda razonable sobre su valor o coherencia
+
+9. PROPUESTAS SIMILARES:
+   - Si dos o más propuestas son similares y se decide aceptarlas, deben compartir el mismo texto_a_incorporar
+   - En ese texto, agrupar los ID usando "(Propuesta ID: [id1], [id2], ...)"
+   - Evitar generar textos duplicados o similares con pequeñas variaciones
+</rules>
 
 <inputs>
 <documento>
