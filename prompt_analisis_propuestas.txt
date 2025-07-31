@@ -12,8 +12,6 @@ de cada evaluación con instrucciones precisas de dónde y cómo incorporar las 
 3. Asegurar que el texto a incorporar: - No repita o reformule contenido ya existente - No desvíe el enfoque estratégico del documento - Sea conciso y esté escrito en lenguaje técnico o administrativo acorde con el resto del documento
 
 4. Toda evaluación positiva debe incluir una justificación comparativa que indique qué aporta la propuesta *que no esté ya incluido* en el documento base.
-
-5. Aumentar el umbral de aceptación: solo propuestas con puntaje de valor "4" o "5" pueden ser ACEPTADAS.
 </criterios_adicionales>
 
 <task>
@@ -120,7 +118,6 @@ de cada evaluación con instrucciones precisas de dónde y cómo incorporar las 
      * No falta ninguna propuesta por procesar
 
 8. FILTRO RIGUROSO:
-   - Solo propuestas con valor claro y diferenciador (puntaje 4 o 5) pueden ser ACEPTADAS
    - No aceptar reformulaciones superficiales ni duplicaciones de contenido existente
    - Evaluar de forma crítica: mejor RECHAZAR si existe duda razonable sobre su valor o coherencia
 
