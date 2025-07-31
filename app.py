@@ -256,13 +256,17 @@ def get_proposals_value(event, context):
         for propuesta in propuestas:
             # Crear un diccionario plano para el DataFrame
             df_dict = {
-                'tema': df_embeddings['title'][i],
+                'proposal_id': propuesta['proposal_id'],
+                'nombre': propuesta['nombre'],
+                'email': propuesta['email'],
                 'decision': eval_dict[propuesta['proposal_id']]['decision'],
                 'justificacion': eval_dict[propuesta['proposal_id']]['justificacion'],
+                'tema': df_embeddings['title'][i],
                 'puntaje': eval_dict[propuesta['proposal_id']]['puntaje_valor'],
                 'texto_a_incorporar': eval_dict[propuesta['proposal_id']]['incorporacion_propuesta']['texto_a_incorporar'],
                 'seccion_especifica': eval_dict[propuesta['proposal_id']]['incorporacion_propuesta']['seccion_especifica'],
                 'parrafo_anterior': eval_dict[propuesta['proposal_id']]['incorporacion_propuesta']['parrafo_anterior'],
+                'parrafo_posterior': eval_dict[propuesta['proposal_id']]['incorporacion_propuesta']['parrafo_posterior'],
                 'email_asunto': eval_dict[propuesta['proposal_id']]['comunicacion_proponente']['asunto'],
                 'email_cuerpo': eval_dict[propuesta['proposal_id']]['comunicacion_proponente']['cuerpo_correo']
             }
