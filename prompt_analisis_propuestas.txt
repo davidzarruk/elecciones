@@ -42,7 +42,49 @@ de cada evaluación con instrucciones precisas de dónde y cómo incorporar las 
     "[proposal_id_1]": {
         "decision": "string (ACEPTADA o RECHAZADA)",
         "justificacion": "string (incluir citas textuales)",
-        "puntaje_valor": "string (1-5)",
+        "puntajes": {
+            "robustez": {
+                "valor": "string (1-5)",
+                "criterios": [
+                    "1: Idea vaga o incompleta",
+                    "2: Idea básica pero poco desarrollada",
+                    "3: Propuesta desarrollada pero faltan detalles",
+                    "4: Propuesta bien desarrollada y específica",
+                    "5: Propuesta detallada, completa y técnicamente sólida"
+                ]
+            },
+            "alineacion": {
+                "valor": "string (1-5)",
+                "criterios": [
+                    "1: No alineada con visión/valores",
+                    "2: Marginalmente alineada",
+                    "3: Parcialmente alineada",
+                    "4: Bien alineada",
+                    "5: Perfectamente alineada y refuerza valores"
+                ]
+            },
+            "viabilidad": {
+                "valor": "string (1-5)",
+                "criterios": [
+                    "1: No viable con recursos/capacidades actuales",
+                    "2: Requiere recursos/cambios significativos",
+                    "3: Viable pero con ajustes importantes",
+                    "4: Viable con ajustes menores",
+                    "5: Completamente viable con recursos actuales"
+                ]
+            },
+            "valor_agregado": {
+                "valor": "string (1-5)",
+                "criterios": [
+                    "1: No agrega valor/duplica existente",
+                    "2: Agrega valor marginal",
+                    "3: Complementa lo existente",
+                    "4: Agrega valor significativo",
+                    "5: Transformacional/innovador"
+                ]
+            },
+            "puntaje_final": "string (promedio redondeado 1-5)"
+        },
         "incorporacion_propuesta": {
             "texto_a_incorporar": "string",
             "seccion_especifica": "string",
@@ -126,6 +168,23 @@ de cada evaluación con instrucciones precisas de dónde y cómo incorporar las 
    - Si dos o más propuestas son similares y se decide aceptarlas, deben compartir el mismo texto_a_incorporar
    - En ese texto, agrupar los ID usando "(Propuesta ID: [id1], [id2], ...)"
    - Evitar generar textos duplicados o similares con pequeñas variaciones
+
+10. SISTEMA DE PUNTAJES:
+    - Cada criterio debe evaluarse independientemente
+    - Usar ÚNICAMENTE valores enteros del 1 al 5
+    - El puntaje_final es el promedio redondeado de los cuatro criterios
+    - Para propuestas RECHAZADAS:
+      * robustez: evaluar normalmente
+      * alineacion: evaluar normalmente
+      * viabilidad: evaluar normalmente
+      * valor_agregado: debe ser "1"
+      * puntaje_final: debe ser "1"
+
+11. JUSTIFICACIÓN DE PUNTAJES:
+    - La justificación debe explicar explícitamente cada puntaje asignado
+    - Usar evidencia del documento para justificar especialmente alineación y viabilidad
+    - Para valor_agregado, explicar específicamente qué aporta nuevo
+    - Para robustez, señalar elementos concretos de la propuesta
 </rules>
 
 <inputs>
