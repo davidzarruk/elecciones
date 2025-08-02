@@ -256,21 +256,39 @@ def get_proposals_value(event, context):
         for propuesta in propuestas:
             # Crear un diccionario plano para el DataFrame
             df_dict = {
+                # Datos básicos del proponente
                 'proposal_id': propuesta['proposal_id'],
                 'nombre': propuesta['nombre'],
                 'email': propuesta['email'],
+                
+                # Evaluación básica
                 'decision': eval_dict[propuesta['proposal_id']]['decision'],
                 'justificacion': eval_dict[propuesta['proposal_id']]['justificacion'],
                 'tema': df_embeddings['title'][i],
-                'puntaje': eval_dict[propuesta['proposal_id']]['puntaje_valor'],
+                
+                # Puntajes
+                'puntaje_robustez': eval_dict[propuesta['proposal_id']]['puntajes']['robustez']['valor'],
+                'puntaje_alineacion': eval_dict[propuesta['proposal_id']]['puntajes']['alineacion']['valor'],
+                'puntaje_viabilidad': eval_dict[propuesta['proposal_id']]['puntajes']['viabilidad']['valor'],
+                'puntaje_valor_agregado': eval_dict[propuesta['proposal_id']]['puntajes']['valor_agregado']['valor'],
+                'puntaje_final': eval_dict[propuesta['proposal_id']]['puntajes']['puntaje_final'],
+                
+                # Criterios de evaluación
+                'criterios_robustez': str(eval_dict[propuesta['proposal_id']]['puntajes']['robustez']['criterios']),
+                'criterios_alineacion': str(eval_dict[propuesta['proposal_id']]['puntajes']['alineacion']['criterios']),
+                'criterios_viabilidad': str(eval_dict[propuesta['proposal_id']]['puntajes']['viabilidad']['criterios']),
+                'criterios_valor_agregado': str(eval_dict[propuesta['proposal_id']]['puntajes']['valor_agregado']['criterios']),
+                
+                # Datos de incorporación
                 'texto_a_incorporar': eval_dict[propuesta['proposal_id']]['incorporacion_propuesta']['texto_a_incorporar'],
                 'seccion_especifica': eval_dict[propuesta['proposal_id']]['incorporacion_propuesta']['seccion_especifica'],
                 'parrafo_anterior': eval_dict[propuesta['proposal_id']]['incorporacion_propuesta']['parrafo_anterior'],
                 'parrafo_posterior': eval_dict[propuesta['proposal_id']]['incorporacion_propuesta']['parrafo_posterior'],
+                
+                # Datos de comunicación
                 'email_asunto': eval_dict[propuesta['proposal_id']]['comunicacion_proponente']['asunto'],
                 'email_cuerpo': eval_dict[propuesta['proposal_id']]['comunicacion_proponente']['cuerpo_correo']
             }
-
             # Crear DataFrame
             df_output = pd.DataFrame([df_dict])
 
