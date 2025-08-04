@@ -220,16 +220,6 @@ def get_proposals_value(event, context):
 
     print(unique_docs)
 
-    propuestas = [
-        {
-            'propuesta': row['propuesta'],
-            'nombre': row['nombre'],
-            'email': row['correo'],
-            'proposal_id': row['proposal_id']
-        }
-        for _, row in df.iterrows()
-    ]
-
     print(f"Getting embeddings from existing proposals...")
     query = f"SELECT DISTINCT title, content FROM documentos_programaticos"
     df_embeddings = query_athena_to_df(query, "news_db", "s3://zarruk/athena-results/")
@@ -240,6 +230,17 @@ def get_proposals_value(event, context):
     for i in range(len(df_embeddings)):
 
         print(f"Documento {df_embeddings['title'][i]} (número {i} de un total de {len(df_embeddings)})")
+
+        propuestas = [
+            {
+                'propuesta': row['propuesta'],
+                'nombre': row['nombre'],
+                'email': row['correo'],
+                'proposal_id': row['proposal_id']
+            }
+            for _, row in df[(df['closest_document_1']==df_embeddings['title'][i]) | 
+                             (df['closest_document_2']==df_embeddings['title'][i])].iterrows()
+        ]
 
         prompt = cargar_prompt(df_embeddings['content'][i],
                                propuestas)
