@@ -267,24 +267,19 @@ def get_proposals_value(event, context):
                 'justificacion': eval_dict[propuesta['proposal_id']]['justificacion'],
                 'tema': df_embeddings['title'][i],
                 
-                # Puntajes
-                'puntaje_robustez': eval_dict[propuesta['proposal_id']]['puntajes']['robustez']['valor'],
-                'puntaje_alineacion': eval_dict[propuesta['proposal_id']]['puntajes']['alineacion']['valor'],
-                'puntaje_viabilidad': eval_dict[propuesta['proposal_id']]['puntajes']['viabilidad']['valor'],
-                'puntaje_valor_agregado': eval_dict[propuesta['proposal_id']]['puntajes']['valor_agregado']['valor'],
+                # Puntajes (estructura actualizada)
+                'puntaje_robustez': eval_dict[propuesta['proposal_id']]['puntajes']['robustez'],
+                'puntaje_alineacion': eval_dict[propuesta['proposal_id']]['puntajes']['alineacion'],
+                'puntaje_viabilidad': eval_dict[propuesta['proposal_id']]['puntajes']['viabilidad'],
+                'puntaje_valor_agregado': eval_dict[propuesta['proposal_id']]['puntajes']['valor_agregado'],
                 'puntaje_final': eval_dict[propuesta['proposal_id']]['puntajes']['puntaje_final'],
-                
-                # Criterios de evaluación
-                'criterios_robustez': str(eval_dict[propuesta['proposal_id']]['puntajes']['robustez']['criterios']),
-                'criterios_alineacion': str(eval_dict[propuesta['proposal_id']]['puntajes']['alineacion']['criterios']),
-                'criterios_viabilidad': str(eval_dict[propuesta['proposal_id']]['puntajes']['viabilidad']['criterios']),
-                'criterios_valor_agregado': str(eval_dict[propuesta['proposal_id']]['puntajes']['valor_agregado']['criterios']),
                 
                 # Datos de incorporación
                 'texto_a_incorporar': eval_dict[propuesta['proposal_id']]['incorporacion_propuesta']['texto_a_incorporar'],
                 'seccion_especifica': eval_dict[propuesta['proposal_id']]['incorporacion_propuesta']['seccion_especifica'],
                 'parrafo_anterior': eval_dict[propuesta['proposal_id']]['incorporacion_propuesta']['parrafo_anterior'],
                 'parrafo_posterior': eval_dict[propuesta['proposal_id']]['incorporacion_propuesta']['parrafo_posterior'],
+                'instrucciones_especificas': eval_dict[propuesta['proposal_id']]['incorporacion_propuesta']['instrucciones_especificas'],
                 
                 # Datos de comunicación
                 'email_asunto': eval_dict[propuesta['proposal_id']]['comunicacion_proponente']['asunto'],
