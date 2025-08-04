@@ -269,10 +269,10 @@ def get_proposals_value(event, context):
                 
                 # Puntajes (estructura actualizada)
                 'puntaje_robustez': eval_dict[propuesta['proposal_id']]['puntajes']['robustez'],
-                'puntaje_alineacion': eval_dict[propuesta['proposal_id']]['puntajes']['alineacion'],
+                'puntaje_alineacion_tematica': eval_dict[propuesta['proposal_id']]['puntajes']['alineacion_tematica'],
+                'puntaje_alineacion_valores': eval_dict[propuesta['proposal_id']]['puntajes']['alineacion_valores'],
                 'puntaje_viabilidad': eval_dict[propuesta['proposal_id']]['puntajes']['viabilidad'],
                 'puntaje_valor_agregado': eval_dict[propuesta['proposal_id']]['puntajes']['valor_agregado'],
-                'puntaje_final': eval_dict[propuesta['proposal_id']]['puntajes']['puntaje_final'],
                 
                 # Datos de incorporación
                 'texto_a_incorporar': eval_dict[propuesta['proposal_id']]['incorporacion_propuesta']['texto_a_incorporar'],

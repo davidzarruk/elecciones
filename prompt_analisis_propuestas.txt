@@ -126,7 +126,6 @@ asegurando que mantenga la coherencia y el tono del documento existente.
                     "5: Valor excepcional (propuesta robusta y completa Y perfectamente alineada con el tema Y no contradice valores)"
                 ]
             }
-            "puntaje_final": "string (promedio redondeado 1-5)"
         },
         "incorporacion_propuesta": {
             "texto_a_incorporar": "string",
