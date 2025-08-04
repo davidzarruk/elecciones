@@ -911,13 +911,21 @@ def cargar_prompt(documento, propuestas):
 
 
 def clean_json_string(json_str):
-    """Limpia caracteres de control problemáticos del JSON"""
-    # Reemplazar saltos de línea dentro de strings con espacios
-    json_str = re.sub(r'(?<!\\)\n', ' ', json_str)
-    # Reemplazar tabs con espacios
-    json_str = re.sub(r'\t', ' ', json_str)
-    # Reemplazar múltiples espacios con uno solo
-    json_str = re.sub(r'\s+', ' ', json_str)
-    # Limpiar caracteres de control problemáticos
+    """Limpia y normaliza JSON string de forma más robusta"""
+    # Primero quitar todos los escapes existentes
+    json_str = json_str.replace('\\', '')
+    
+    # Limpiar caracteres de control
     json_str = re.sub(r'[\x00-\x1f\x7f-\x9f]', '', json_str)
+    
+    # Reemplazar saltos de línea y tabs
+    json_str = re.sub(r'\n|\t', ' ', json_str)
+    
+    # Reemplazar múltiples espacios
+    json_str = re.sub(r'\s+', ' ', json_str)
+    
+    # Ahora escapar correctamente
+    json_str = json_str.replace('\\', '\\\\')
+    json_str = json_str.replace('"', '\\"')
+    
     return json_str
