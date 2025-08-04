@@ -911,21 +911,22 @@ def cargar_prompt(documento, propuestas):
 
 
 def clean_json_string(json_str):
-    """Limpia y normaliza JSON string de forma más robusta"""
-    # Primero quitar todos los escapes existentes
-    json_str = json_str.replace('\\', '')
-    
-    # Limpiar caracteres de control
+    """Limpia y normaliza JSON string de forma más completa"""
+    # Limpieza básica
     json_str = re.sub(r'[\x00-\x1f\x7f-\x9f]', '', json_str)
-    
-    # Reemplazar saltos de línea y tabs
     json_str = re.sub(r'\n|\t', ' ', json_str)
-    
-    # Reemplazar múltiples espacios
     json_str = re.sub(r'\s+', ' ', json_str)
     
-    # Ahora escapar correctamente
-    json_str = json_str.replace('\\', '\\\\')
-    json_str = json_str.replace('"', '\\"')
+    # Asegurar que las claves tengan comillas dobles
+    def quote_keys(match):
+        key = match.group(1)
+        # Evitar duplicar comillas
+        if key.startswith('"') and key.endswith('"'):
+            return f'{key}:'
+        return f'"{key}":'
+    
+    # Patrón más robusto para encontrar claves
+    pattern = r'(?<={|,)\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*:'
+    json_str = re.sub(pattern, quote_keys, json_str)
     
     return json_str
