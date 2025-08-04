@@ -252,6 +252,7 @@ def get_proposals_value(event, context):
 
         eval_dict = json.loads(clean_json_string(extract_json(response)))
 
+        print(eval_dict)
 
         for propuesta in propuestas:
             # Crear un diccionario plano para el DataFrame
