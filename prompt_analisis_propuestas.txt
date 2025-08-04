@@ -79,53 +79,37 @@ asegurando que mantenga la coherencia y el tono del documento existente.
         "decision": "string (ACEPTADA o RECHAZADA)",
         "justificacion": "string (incluir citas textuales)",
         "puntajes": {
-            "robustez": {
-                "valor": "string (1-5)",
-                "criterios": [
-                    "1: Propuesta vaga, sin detalles ni mecanismos de implementación",
-                    "2: Idea identificable pero sin desarrollo técnico ni operativo",
-                    "3: Propuesta con objetivos claros pero mecanismos parcialmente definidos",
-                    "4: Propuesta bien estructurada con mecanismos y recursos identificados",
-                    "5: Propuesta completa con análisis técnico, presupuestal y de impacto"
-                ]
-            },
-            "alineacion_tematica": {
-                "valor": "string (1-5)",
-                "criterios": [
-                    "1: No relacionada con el tema/documento",
-                    "2: Tangencialmente relacionada",
-                    "3: Relacionada pero requiere adaptación significativa",
-                    "4: Bien alineada con el tema y enfoque del documento",
-                    "5: Perfectamente integrada con objetivos y estrategias del documento"
-                ]
-            },
-            "alineacion_valores": {
-                "valor": "string (COMPATIBLE o INCOMPATIBLE)",
-                "criterios": [
-                    "COMPATIBLE: No contradice los valores fundamentales de transparencia, ética y respeto institucional",
-                    "INCOMPATIBLE: Contradice explícitamente alguno de los valores fundamentales"
-                ]
-            },
-            "viabilidad": {
-                "valor": "string (1-5)",
-                "criterios": [
-                    "1: No viable con recursos/capacidades actuales",
-                    "2: Requiere recursos/cambios significativos",
-                    "3: Viable pero con ajustes importantes",
-                    "4: Viable con ajustes menores",
-                    "5: Completamente viable con recursos actuales"
-                ]
-            },
-            "valor_agregado": {
-                "valor": "string (1-5)",
-                "criterios": [
-                    "1: No aporta valor (propuesta vaga/incompleta O no alineada temáticamente O contradice valores)",
-                    "2: Valor limitado (propuesta básica Y/O débilmente alineada con el tema, aunque no contradice valores)",
-                    "3: Valor moderado (propuesta desarrollada Y alineada temáticamente Y no contradice valores)",
-                    "4: Valor significativo (propuesta bien desarrollada Y bien alineada temáticamente Y no contradice valores)",
-                    "5: Valor excepcional (propuesta robusta y completa Y perfectamente alineada con el tema Y no contradice valores)"
-                ]
-            }
+            "robustez": "string (uno de los siguientes criterios):
+                1: Propuesta vaga, sin detalles ni mecanismos de implementación
+                2: Idea identificable pero sin desarrollo técnico ni operativo
+                3: Propuesta con objetivos claros pero mecanismos parcialmente definidos
+                4: Propuesta bien estructurada con mecanismos y recursos identificados
+                5: Propuesta completa con análisis técnico, presupuestal y de impacto",
+            
+            "alineacion_tematica": "string (uno de los siguientes criterios):
+                1: No relacionada con el tema/documento
+                2: Tangencialmente relacionada
+                3: Relacionada pero requiere adaptación significativa
+                4: Bien alineada con el tema y enfoque del documento
+                5: Perfectamente integrada con objetivos y estrategias del documento",
+            
+            "alineacion_valores": "string (uno de los siguientes criterios):
+                COMPATIBLE: No contradice los valores fundamentales de transparencia, ética y respeto institucional
+                INCOMPATIBLE: Contradice explícitamente alguno de los valores fundamentales",
+            
+            "viabilidad": "string (uno de los siguientes criterios):
+                1: No viable con recursos/capacidades actuales
+                2: Requiere recursos/cambios significativos
+                3: Viable pero con ajustes importantes
+                4: Viable con ajustes menores
+                5: Completamente viable con recursos actuales",
+            
+            "valor_agregado": "string (uno de los siguientes criterios):
+                1: No aporta valor (propuesta vaga/incompleta O no alineada temáticamente O contradice valores)
+                2: Valor limitado (propuesta básica Y/O débilmente alineada con el tema, aunque no contradice valores)
+                3: Valor moderado (propuesta desarrollada Y alineada temáticamente Y no contradice valores)
+                4: Valor significativo (propuesta bien desarrollada Y bien alineada temáticamente Y no contradice valores)
+                5: Valor excepcional (propuesta robusta y completa Y perfectamente alineada con el tema Y no contradice valores)"
         },
         "incorporacion_propuesta": {
             "texto_a_incorporar": "string",
