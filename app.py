@@ -4,8 +4,8 @@ from utils import get_links, get_articles, update_db, \
     get_sentiment, read_df_from_s3, get_propuesta, clean_and_format_name, \
     query_athena_to_df, filter_new_by_candidate_names, send_gmail, batch_scheduler_propuestas, \
     generate_text_dataframe, read_all_files_from_s3_folder, compute_closest_texts, get_embedding, \
-    cargar_prompt, answer_question, extract_json, store_df_as_parquet, read_pdf_from_s3, \
-    clean_json_string
+    cargar_prompt, answer_question, extract_json, store_df_as_parquet, \
+    clean_json_string, cargar_prompt_correo
 from params import NUM_NEWS, QUERY_PARAMS, ATHENA_TABLE, ATHENA_DB, ATHENA_OUTPUT, QUEUE_URL, \
     SUBJECT_EMAIL, RESPUESTAS_CORREO, REMITENTES
 import pandas as pd
@@ -149,7 +149,7 @@ def queue_proposal(event, context):
     sqs = boto3.client('sqs')
 
     print(f"Getting embeddings from existing proposals...")
-    query = f"SELECT DISTINCT titulo, embedding FROM documentos_programaticos"
+    query = f"SELECT DISTINCT title, embedding FROM documentos_programaticos"
     df_embeddings = query_athena_to_df(query, "news_db", "s3://zarruk/athena-results/")
 
     print(f"Getting embedding for proposal...")
@@ -161,7 +161,7 @@ def queue_proposal(event, context):
                                                           embedding_column = 'embedding')
     
     print(f"Top 5 similarities: {top_similarities[0:5]}")
-    print(f"Top 5 themes: {df_embeddings['titulo'][top_indices[0:5]]}")
+    print(f"Top 5 themes: {df_embeddings['title'][top_indices[0:5]]}")
 
     print(f"Storing message...")
     message = {
@@ -170,11 +170,11 @@ def queue_proposal(event, context):
         "correo": event['correo'],
         "propuesta": event['propuesta'],
         "embedding": target_embedding,
-        "closest_document_1": df_embeddings['titulo'][top_indices[0]],
-        "closest_document_2": df_embeddings['titulo'][top_indices[1]],
-        "closest_document_3": df_embeddings['titulo'][top_indices[2]],
-        "closest_document_4": df_embeddings['titulo'][top_indices[3]],
-        "closest_document_5": df_embeddings['titulo'][top_indices[4]],
+        "closest_document_1": df_embeddings['title'][top_indices[0]],
+        "closest_document_2": df_embeddings['title'][top_indices[1]],
+        "closest_document_3": df_embeddings['title'][top_indices[2]],
+        "closest_document_4": df_embeddings['title'][top_indices[3]],
+        "closest_document_5": df_embeddings['title'][top_indices[4]],
         "submitted_at": datetime.utcnow().isoformat()
     }
     
@@ -189,15 +189,18 @@ def queue_proposal(event, context):
     batch_scheduler_propuestas(QUEUE_URL, purge_queue=False)
 
     first_name = event['nombre'].split(" ")[0]
-    remitente = random.choice(REMITENTES)
-    subject = random.choice(SUBJECT_EMAIL).format(clean_and_format_name(first_name))
+#    remitente = random.choice(REMITENTES)
+#    subject = random.choice(SUBJECT_EMAIL).format(clean_and_format_name(first_name))
+
+    prompt = cargar_prompt_correo(first_name, event['propuesta'][0:500], event['correo'])
+        
+    response = answer_question("", prompt)
+    eval_dict = json.loads(clean_json_string(extract_json(response)))
 
     print(f"Sending email...")
     send_gmail(event['correo'],
-               subject,
-               random.choice(RESPUESTAS_CORREO).format(clean_and_format_name(first_name),
-                                                       df_embeddings['titulo'][top_indices[0]].lower(),
-                                                       remitente))
+               eval_dict['asunto'],
+               eval_dict['cuerpo'])
     
 
 def get_proposals_value(event, context):
@@ -300,6 +303,8 @@ def get_proposals_value(event, context):
 
     store_df_as_parquet(df_all, s3_key, "propuestas", partition, "propuestas_analyzed")
 
+    
+
 
 
 def construct_document_embeddings(event, context):
@@ -330,12 +335,13 @@ def construct_document_embeddings(event, context):
 
 if __name__ == "__main__":
 
-#    queue_proposal({'propuesta': """
-#                    """,
-#                    'nombre': 'david zarruk',
-#                    'correo': 'davidzarruk@gmail.com'}, {})
+    queue_proposal({'propuesta': """debería haber educación gratuita y universal
+                    """,
+                    'nombre': 'david zarruk',
+                    'correo': 'davidzarruk@gmail.com',
+                    'model': 'claude'}, {})
 
-    get_proposals_value({'model': 'claude'}, {})
+#    get_proposals_value({'model': 'claude'}, {})
 
 #    batch_scheduler_propuestas({}, {})
 

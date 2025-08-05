@@ -5,6 +5,9 @@ import boto3
 import pandas as pd
 from params import ATHENA_DB, ATHENA_OUTPUT
 import io
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+
 
 
 def run_athena_query(query, database, output_location):
@@ -883,6 +886,17 @@ def compute_closest_texts(target_embedding, embeddings, embedding_column='embedd
     top_similarities = similarities[top_indices]
 
     return top_indices, top_similarities
+
+
+def cargar_prompt_correo(nombre, propuesta, correo):
+    with open('prompt_respuesta_inmediata_propuesta.txt', 'r', encoding='utf-8') as file:
+        template = file.read()
+    
+    prompt_final = template.replace('{{NOMBRE}}', nombre)
+    prompt_final = prompt_final.replace('{{PROPUESTA}}', propuesta)
+    prompt_final = prompt_final.replace('{{EMAIL}}', correo)
+    
+    return prompt_final
 
 
 def cargar_prompt(documento, propuestas):
