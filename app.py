@@ -316,9 +316,9 @@ def get_proposals_value(event, context, max_retries=3):
     print(f"Sending thank you email...")
     for i in range(len(df_final)):
         
-        send_gmail(re.sub(r' | ', '\n', df_final.iloc[i]['email']),
-                   re.sub(r' | ', '\n', df_final.iloc[i]['email_asunto']),
-                   re.sub(r' | ', '\n', df_final.iloc[i]['email_cuerpo']))
+        send_gmail(df_final.iloc[i]['email'].replace(" | ", "\n"),
+                   df_final.iloc[i]['email_asunto'].replace(" | ", "\n"),
+                   df_final.iloc[i]['email_cuerpo'].replace(" | ", "\n"))
 
 
 def construct_document_embeddings(event, context):
