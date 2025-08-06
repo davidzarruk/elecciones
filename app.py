@@ -313,9 +313,10 @@ def get_proposals_value(event, context, max_retries=3):
     print(df_final['email_cuerpo'])
 
     print(f"Sending thank you email...")
-    send_gmail(df_final['email'][0],
-               df_final['email_asunto'][0],
-               df_final['email_cuerpo'][0])
+    for i in range(len(df_final)):
+        send_gmail(df_final['email'][i],
+                    df_final['email_asunto'][i],
+                    df_final['email_cuerpo'][i])
 
 
 def construct_document_embeddings(event, context):
