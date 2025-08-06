@@ -303,7 +303,8 @@ def get_proposals_value(event, context):
 
     store_df_as_parquet(df_all, s3_key, "propuestas", partition, "propuestas_analyzed")
 
-    df_all['max_alineaciomn'] = df_all.groupby('proposal_id')['puntaje_alineacion'].transform('max')
+    df_all['max_alineacion'] = df_all.groupby('proposal_id')['puntaje_alineacion_tematica'].transform('max')
+    df_all = df_all[df_all['max_alineacion'] == df_all['puntaje_alineacion_tematica']]
     df_final = df_all.groupby('proposal_id').sample(n=1)
 
     print(f"Sending thank you email...")
