@@ -9,6 +9,7 @@ COPY params.py ${LAMBDA_TASK_ROOT}
 COPY prompt.txt ${LAMBDA_TASK_ROOT}
 COPY prompt_analisis_propuestas.txt ${LAMBDA_TASK_ROOT}
 COPY lista_candidatos.txt ${LAMBDA_TASK_ROOT}
+COPY prompt_respuesta_inmediata_propuesta.txt ${LAMBDA_TASK_ROOT}
 
 # Install the function's dependencies using file requirements.txt
 COPY requirements.txt .
