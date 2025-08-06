@@ -947,7 +947,6 @@ def clean_json_string(json_str):
     json_str = re.sub(r'[\x00-\x1f\x7f-\x9f]', '', json_str)
     json_str = re.sub(r'\n|\t', ' ', json_str)
     json_str = re.sub(r'\s+', ' ', json_str)
-    json_str = re.sub(r' | ', '\n', json_str)
     
     # Asegurar que las claves tengan comillas dobles
     def quote_keys(match):

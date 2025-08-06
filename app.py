@@ -17,6 +17,7 @@ import boto3
 import uuid
 import time
 import numpy as np
+import re
 
 
 def scrape_news(event, context):
@@ -314,9 +315,10 @@ def get_proposals_value(event, context, max_retries=3):
 
     print(f"Sending thank you email...")
     for i in range(len(df_final)):
-        send_gmail(df_final['email'][i],
-                    df_final['email_asunto'][i],
-                    df_final['email_cuerpo'][i])
+        
+        send_gmail(re.sub(r' | ', '\n', df_final['email'][i]),
+                   re.sub(r' | ', '\n', df_final['email_asunto'][i]),
+                   re.sub(r' | ', '\n', df_final['email_cuerpo'][i]))
 
 
 def construct_document_embeddings(event, context):
@@ -347,13 +349,13 @@ def construct_document_embeddings(event, context):
 
 if __name__ == "__main__":
 
-    queue_proposal({'propuesta': """debería haber educación gratuita y universal
-                    """,
-                    'nombre': 'david zarruk',
-                    'correo': 'davidzarruk@gmail.com',
-                    'model': 'claude'}, {})
+#    queue_proposal({'propuesta': """debería haber educación gratuita y universal
+#                    """,
+#                    'nombre': 'david zarruk',
+#                    'correo': 'davidzarruk@gmail.com',
+#                    'model': 'claude'}, {})
 
-#    get_proposals_value({'model': 'claude'}, {})
+    get_proposals_value({'model': 'claude'}, {})
 
 #    batch_scheduler_propuestas({}, {})
 
