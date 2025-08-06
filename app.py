@@ -303,8 +303,13 @@ def get_proposals_value(event, context):
 
     store_df_as_parquet(df_all, s3_key, "propuestas", partition, "propuestas_analyzed")
 
-    
+    df_all['max_alineaciomn'] = df_all.groupby('proposal_id')['puntaje_alineacion'].transform('max')
+    df_final = df_all.groupby('proposal_id').sample(n=1)
 
+    print(f"Sending thank you email...")
+    send_gmail(df_final['email'],
+               df_final['email_asunto'],
+               df_final['email_cuerpo'])
 
 
 def construct_document_embeddings(event, context):
