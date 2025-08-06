@@ -638,54 +638,71 @@ def get_articles_elespectador(link, session):
     return df
 
 
-def get_df_from_queue(queue_url, purge_queue=True):
+def get_df_from_queue(queue_url, purge_queue=True, max_attempts=3):
     sqs = boto3.client('sqs')
     
     all_messages = []
     delete_entries = []
 
-    while True:
-        response = sqs.receive_message(
-            QueueUrl=queue_url,
-            MaxNumberOfMessages=10,
-            WaitTimeSeconds=1
-        )
+    for attempt in range(max_attempts):
+        try:
+            while True:
+                response = sqs.receive_message(
+                    QueueUrl=queue_url,
+                    MaxNumberOfMessages=10,
+                    WaitTimeSeconds=1
+                )
 
-        messages = response.get('Messages', [])
-        if not messages:
+                messages = response.get('Messages', [])
+                if not messages:
+                    break
+
+                for msg in messages:
+                    body = json.loads(msg['Body'])
+                    all_messages.append(body)
+
+                    if purge_queue:
+                        delete_entries.append({
+                            'Id': msg['MessageId'],
+                            'ReceiptHandle': msg['ReceiptHandle']
+                        })
+
+                # Delete processed messages
+                if delete_entries:
+                    sqs.delete_message_batch(
+                        QueueUrl=queue_url,
+                        Entries=delete_entries
+                    )
+                    delete_entries.clear()
+
+            # If we successfully processed everything, break the retry loop
             break
 
-        for msg in messages:
-            body = json.loads(msg['Body'])
-            all_messages.append(body)
-
-            if purge_queue:
-                delete_entries.append({
-                    'Id': msg['MessageId'],
-                    'ReceiptHandle': msg['ReceiptHandle']
-                })
-
-        # Delete processed messages
-        if delete_entries:
-            sqs.delete_message_batch(
-                QueueUrl=queue_url,
-                Entries=delete_entries
-            )
-            delete_entries.clear()
+        except Exception as e:
+            print(f"Attempt {attempt + 1} failed: {str(e)}")
+            if attempt == max_attempts - 1:
+                print("All attempts failed")
+                break
+            continue
 
     if not all_messages:
         return pd.DataFrame()
 
     # Convert to DataFrame
-    df = pd.DataFrame(all_messages)
+    try:
+        df = pd.DataFrame(all_messages)
 
-    # Ensure all columns exist
-    expected_columns = ['proposal_id', 'nombre', 'correo', 'propuesta', 'submitted_at']
-    for col in expected_columns:
-        if col not in df.columns:
-            df[col] = None
+        # Ensure all columns exist
+        expected_columns = ['proposal_id', 'nombre', 'correo', 'propuesta', 'submitted_at']
+        for col in expected_columns:
+            if col not in df.columns:
+                df[col] = None
 
-    return df
+        return df
+    
+    except Exception as e:
+        print(f"Error creating DataFrame: {str(e)}")
+        return pd.DataFrame()
 
 def get_access_token():
     import requests

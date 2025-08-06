@@ -203,7 +203,7 @@ def queue_proposal(event, context):
                eval_dict['cuerpo'])
     
 
-def get_proposals_value(event, context):
+def get_proposals_value(event, context, max_retries=3):
     
     print("Reading proposals")
     query = """
@@ -248,52 +248,54 @@ def get_proposals_value(event, context):
         prompt = cargar_prompt(df_embeddings['content'][i],
                                propuestas)
         
-        print("LLM analyzing proposal...")
-        if 'model' in event:
-            response = answer_question("", prompt, model_choice=event['model'])
-        else:
-            response = answer_question("", prompt)
+        for attempt in range(max_retries):
+            try:
+                print(f"LLM analyzing proposal... (Attempt {attempt + 1}/{max_retries})")
+                if 'model' in event:
+                    response = answer_question("", prompt, model_choice=event['model'])
+                else:
+                    response = answer_question("", prompt)
 
-        eval_dict = json.loads(clean_json_string(extract_json(response)))
+                eval_dict = json.loads(clean_json_string(extract_json(response)))
 
-        print(eval_dict)
-
-        for propuesta in propuestas:
-            # Crear un diccionario plano para el DataFrame
-            df_dict = {
-                # Datos básicos del proponente
-                'proposal_id': propuesta['proposal_id'],
-                'nombre': propuesta['nombre'],
-                'email': propuesta['email'],
+                print(eval_dict)
                 
-                # Evaluación básica
-                'decision': eval_dict[propuesta['proposal_id']]['decision'],
-                'justificacion': eval_dict[propuesta['proposal_id']]['justificacion'],
-                'tema': df_embeddings['title'][i],
-                
-                # Puntajes (estructura actualizada)
-                'puntaje_robustez': eval_dict[propuesta['proposal_id']]['puntajes']['robustez'],
-                'puntaje_alineacion_tematica': eval_dict[propuesta['proposal_id']]['puntajes']['alineacion_tematica'],
-                'puntaje_alineacion_valores': eval_dict[propuesta['proposal_id']]['puntajes']['alineacion_valores'],
-                'puntaje_viabilidad': eval_dict[propuesta['proposal_id']]['puntajes']['viabilidad'],
-                'puntaje_valor_agregado': eval_dict[propuesta['proposal_id']]['puntajes']['valor_agregado'],
-                
-                # Datos de incorporación
-                'texto_a_incorporar': eval_dict[propuesta['proposal_id']]['incorporacion_propuesta']['texto_a_incorporar'],
-                'seccion_especifica': eval_dict[propuesta['proposal_id']]['incorporacion_propuesta']['seccion_especifica'],
-                'parrafo_anterior': eval_dict[propuesta['proposal_id']]['incorporacion_propuesta']['parrafo_anterior'],
-                'parrafo_posterior': eval_dict[propuesta['proposal_id']]['incorporacion_propuesta']['parrafo_posterior'],
-                'instrucciones_especificas': eval_dict[propuesta['proposal_id']]['incorporacion_propuesta']['instrucciones_especificas'],
-                
-                # Datos de comunicación
-                'email_asunto': eval_dict[propuesta['proposal_id']]['comunicacion_proponente']['asunto'],
-                'email_cuerpo': eval_dict[propuesta['proposal_id']]['comunicacion_proponente']['cuerpo_correo']
-            }
-            # Crear DataFrame
-            df_output = pd.DataFrame([df_dict])
+                df_all = pd.DataFrame()  # Initialize empty DataFrame if needed
 
-            df_all = pd.concat([df_all, df_output])
+                for propuesta in propuestas:
+                    # Crear un diccionario plano para el DataFrame
+                    df_dict = {
+                        'proposal_id': propuesta['proposal_id'],
+                        'nombre': propuesta['nombre'],
+                        'email': propuesta['email'],
+                        'decision': eval_dict[propuesta['proposal_id']]['decision'],
+                        'justificacion': eval_dict[propuesta['proposal_id']]['justificacion'],
+                        'tema': df_embeddings['title'][i],
+                        'puntaje_robustez': eval_dict[propuesta['proposal_id']]['puntajes']['robustez'],
+                        'puntaje_alineacion_tematica': eval_dict[propuesta['proposal_id']]['puntajes']['alineacion_tematica'],
+                        'puntaje_alineacion_valores': eval_dict[propuesta['proposal_id']]['puntajes']['alineacion_valores'],
+                        'puntaje_viabilidad': eval_dict[propuesta['proposal_id']]['puntajes']['viabilidad'],
+                        'puntaje_valor_agregado': eval_dict[propuesta['proposal_id']]['puntajes']['valor_agregado'],
+                        'texto_a_incorporar': eval_dict[propuesta['proposal_id']]['incorporacion_propuesta']['texto_a_incorporar'],
+                        'seccion_especifica': eval_dict[propuesta['proposal_id']]['incorporacion_propuesta']['seccion_especifica'],
+                        'parrafo_anterior': eval_dict[propuesta['proposal_id']]['incorporacion_propuesta']['parrafo_anterior'],
+                        'parrafo_posterior': eval_dict[propuesta['proposal_id']]['incorporacion_propuesta']['parrafo_posterior'],
+                        'instrucciones_especificas': eval_dict[propuesta['proposal_id']]['incorporacion_propuesta']['instrucciones_especificas'],
+                        'email_asunto': eval_dict[propuesta['proposal_id']]['comunicacion_proponente']['asunto'],
+                        'email_cuerpo': eval_dict[propuesta['proposal_id']]['comunicacion_proponente']['cuerpo_correo']
+                    }
+                    # Crear DataFrame
+                    df_output = pd.DataFrame([df_dict])
+                    df_all = pd.concat([df_all, df_output])
 
+                break
+
+            except Exception as e:
+                print(f"Attempt {attempt + 1} failed with error: {str(e)}")
+                if attempt == max_retries - 1:  # If this was the last attempt
+                    print("All retry attempts failed")
+                    raise  # Re-raise the last exception
+                
     now = datetime.utcnow()
     dt = now.strftime('%Y-%m-%d')
     hr = now.strftime('%H')
@@ -307,10 +309,14 @@ def get_proposals_value(event, context):
     df_all = df_all[df_all['max_alineacion'] == df_all['puntaje_alineacion_tematica']]
     df_final = df_all.groupby('proposal_id').sample(n=1)
 
+    print(df_final['email'])
+    print(df_final['email_asunto'])
+    print(df_final['email_cuerpo'])
+
     print(f"Sending thank you email...")
-    send_gmail(df_final['email'],
-               df_final['email_asunto'],
-               df_final['email_cuerpo'])
+    send_gmail(df_final['email'][0],
+               df_final['email_asunto'][0],
+               df_final['email_cuerpo'][0])
 
 
 def construct_document_embeddings(event, context):
