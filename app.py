@@ -260,8 +260,6 @@ def get_proposals_value(event, context, max_retries=3):
 
                 print(eval_dict)
                 
-                df_all = pd.DataFrame()  # Initialize empty DataFrame if needed
-
                 for propuesta in propuestas:
                     # Crear un diccionario plano para el DataFrame
                     df_dict = {
@@ -306,7 +304,8 @@ def get_proposals_value(event, context, max_retries=3):
     store_df_as_parquet(df_all, s3_key, "propuestas", partition, "propuestas_analyzed")
 
     df_all['max_alineacion'] = df_all.groupby('proposal_id')['puntaje_alineacion_tematica'].transform('max')
-    df_all = df_all[df_all['max_alineacion'] == df_all['puntaje_alineacion_tematica']]
+    df_all = df_all[(df_all['max_alineacion'] == df_all['puntaje_alineacion_tematica']) &
+                    (df_all['decision'] == 'ACEPTADA')]
     df_final = df_all.groupby('proposal_id').sample(n=1)
 
     print(df_final['email'])
